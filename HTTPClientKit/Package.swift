@@ -4,6 +4,9 @@ import PackageDescription
 
 let package = Package(
   name: "HTTPClientKit",
+  platforms: [
+    .macOS(.v15),
+  ],
   products: [
     .library(
       name: "HTTPClientKit",

@@ -1,4 +1,5 @@
 import SwiftUI
+import HTTPClientKit
 
 @main
 struct HTTPClientApp: App {
