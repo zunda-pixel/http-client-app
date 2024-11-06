@@ -39,6 +39,18 @@ struct RequestDetailView: View {
     }
   }
   
+  func execute() async {
+    guard let httpRequest = request.httpRequest else { return }
+    let startDate = Date.now
+
+    do {
+      let (data, response) = try await URLSession.shared.data(for: httpRequest)
+      resultState.result = .init(startTime: startDate, endTime: .now, result: .success((data, response)))
+    } catch {
+      resultState.result = .init(startTime: startDate, endTime: .now, result: .failure(error))
+    }
+  }
+  
   var body: some View {
     Form {
       TextField("Name", text: $request.name)
@@ -107,10 +119,13 @@ struct RequestDetailView: View {
       }
       
       Button("Execute") {
-        Task {
-          guard let httpRequest = request.httpRequest else { return }
-          let (data, response) = try await URLSession.shared.data(for: httpRequest)
-          resultState.result = (data: data, response: response)        }
+        Task { await execute() }
+      }
+      
+      Section("Info") {
+        LabeledContent("CreatedAt") {
+          Text(request.createdAt, style: .date)
+        }
       }
     }
     .formStyle(.grouped)

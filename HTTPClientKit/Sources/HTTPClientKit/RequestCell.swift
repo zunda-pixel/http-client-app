@@ -12,7 +12,6 @@ struct RequestCell: View {
         Text(request.baseUrl)
           .lineLimit(1)
       }
-      Text(request.updatedAt, style: .date)
     }
   }
 }

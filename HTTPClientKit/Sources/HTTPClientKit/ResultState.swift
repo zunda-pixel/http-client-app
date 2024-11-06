@@ -4,5 +4,5 @@ import Foundation
 
 @Observable
 final class ResultState {
-  var result: (data: Data, response: HTTPResponse)?
+  var result: HTTPResult?
 }

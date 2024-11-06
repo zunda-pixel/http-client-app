@@ -33,7 +33,7 @@ public struct ContentView: View {
       .environment(router)
     } detail: {
       if let result = resultState.result {
-        ResultDetailView(data: result.data, response: result.response)
+        ResultDetailView(result: result)
       }
     }
     .environment(resultState)
