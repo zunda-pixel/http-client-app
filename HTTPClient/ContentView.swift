@@ -1,4 +1,5 @@
 import SwiftUI
+import HTTPClientKit
 
 struct ContentView: View {
   var body: some View {

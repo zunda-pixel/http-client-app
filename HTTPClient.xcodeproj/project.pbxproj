@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		2EF6D6FC2CDB85520053BAED /* HTTPClientKit in Frameworks */ = {isa = PBXBuildFile; productRef = 2EF6D6FB2CDB85520053BAED /* HTTPClientKit */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		2E6A53DF2CDB839D00CAF0AE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -27,6 +31,7 @@
 		2E6A53CD2CDB839C00CAF0AE /* HTTPClient.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HTTPClient.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2E6A53DE2CDB839D00CAF0AE /* HTTPClientTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HTTPClientTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		2E6A53E82CDB839D00CAF0AE /* HTTPClientUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HTTPClientUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		2EF6D6F92CDB85410053BAED /* HTTPClientKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = HTTPClientKit; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -52,6 +57,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2EF6D6FC2CDB85520053BAED /* HTTPClientKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -75,9 +81,11 @@
 		2E6A53C42CDB839C00CAF0AE = {
 			isa = PBXGroup;
 			children = (
+				2EF6D6F92CDB85410053BAED /* HTTPClientKit */,
 				2E6A53CF2CDB839C00CAF0AE /* HTTPClient */,
 				2E6A53E12CDB839D00CAF0AE /* HTTPClientTests */,
 				2E6A53EB2CDB839D00CAF0AE /* HTTPClientUITests */,
+				2EF6D6FA2CDB85520053BAED /* Frameworks */,
 				2E6A53CE2CDB839C00CAF0AE /* Products */,
 			);
 			sourceTree = "<group>";
@@ -90,6 +98,13 @@
 				2E6A53E82CDB839D00CAF0AE /* HTTPClientUITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		2EF6D6FA2CDB85520053BAED /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -112,6 +127,7 @@
 			);
 			name = HTTPClient;
 			packageProductDependencies = (
+				2EF6D6FB2CDB85520053BAED /* HTTPClientKit */,
 			);
 			productName = HTTPClient;
 			productReference = 2E6A53CD2CDB839C00CAF0AE /* HTTPClient.app */;
@@ -583,6 +599,13 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		2EF6D6FB2CDB85520053BAED /* HTTPClientKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = HTTPClientKit;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 2E6A53C52CDB839C00CAF0AE /* Project object */;
 }
