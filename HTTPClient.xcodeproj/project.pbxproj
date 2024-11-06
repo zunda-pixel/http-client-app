@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		2EF6D6FC2CDB85520053BAED /* HTTPClientKit in Frameworks */ = {isa = PBXBuildFile; productRef = 2EF6D6FB2CDB85520053BAED /* HTTPClientKit */; };
+		2EDCAF562CDB8B2B00DDB3FC /* HTTPClientKit in Frameworks */ = {isa = PBXBuildFile; productRef = 2EDCAF552CDB8B2B00DDB3FC /* HTTPClientKit */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -28,10 +28,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		2E40A6E52CDB8A4400C38F29 /* HTTPClientKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = HTTPClientKit; sourceTree = "<group>"; };
 		2E6A53CD2CDB839C00CAF0AE /* HTTPClient.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HTTPClient.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2E6A53DE2CDB839D00CAF0AE /* HTTPClientTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HTTPClientTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		2E6A53E82CDB839D00CAF0AE /* HTTPClientUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HTTPClientUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		2EF6D6F92CDB85410053BAED /* HTTPClientKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = HTTPClientKit; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -57,7 +57,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2EF6D6FC2CDB85520053BAED /* HTTPClientKit in Frameworks */,
+				2EDCAF562CDB8B2B00DDB3FC /* HTTPClientKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -81,7 +81,7 @@
 		2E6A53C42CDB839C00CAF0AE = {
 			isa = PBXGroup;
 			children = (
-				2EF6D6F92CDB85410053BAED /* HTTPClientKit */,
+				2E40A6E52CDB8A4400C38F29 /* HTTPClientKit */,
 				2E6A53CF2CDB839C00CAF0AE /* HTTPClient */,
 				2E6A53E12CDB839D00CAF0AE /* HTTPClientTests */,
 				2E6A53EB2CDB839D00CAF0AE /* HTTPClientUITests */,
@@ -127,7 +127,7 @@
 			);
 			name = HTTPClient;
 			packageProductDependencies = (
-				2EF6D6FB2CDB85520053BAED /* HTTPClientKit */,
+				2EDCAF552CDB8B2B00DDB3FC /* HTTPClientKit */,
 			);
 			productName = HTTPClient;
 			productReference = 2E6A53CD2CDB839C00CAF0AE /* HTTPClient.app */;
@@ -601,7 +601,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		2EF6D6FB2CDB85520053BAED /* HTTPClientKit */ = {
+		2EDCAF552CDB8B2B00DDB3FC /* HTTPClientKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = HTTPClientKit;
 		};
