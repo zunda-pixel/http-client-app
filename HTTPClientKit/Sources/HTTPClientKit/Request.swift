@@ -5,7 +5,7 @@ import Tagged
 
 struct Request: Sendable, Hashable, Identifiable {
   typealias ID = Tagged<Self, UUID>
-  let id: ID = .init()
+  var id: ID = .init()
   var name: String = ""
   var createdAt: Date = .now
   var updatedAt: Date = .now

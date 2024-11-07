@@ -57,6 +57,8 @@ struct RequestDetailView: View {
       Picker(selection: $request.method) {
         ForEach(HTTPRequest.Method.allCases) { method in
           Text(method.rawValue)
+            .bold()
+            .foregroundStyle(method.color)
         }
       } label: {
         Text("HTTP Method")
@@ -64,28 +66,41 @@ struct RequestDetailView: View {
 
       Section("URL & Queries") {
         TextField("Base URL", text: $request.baseUrl)
-
-        if request.queries.isEmpty {
-          Text("No queries")
-        }
         
         ForEach($request.queries, id: \.self) { queryItem in
           HStack {
             TextField("Name", text: queryItem.name)
+            Divider()
             TextField("Value", text: Binding<String> {
               queryItem.wrappedValue.value ?? ""
             } set: { newValue in
               queryItem.wrappedValue.value = newValue
             })
+            
+            Button("X", role: .destructive) {
+              request.queries.removeAll(where: { $0 == queryItem.wrappedValue })
+            }
           }
         }
         
-        Button("Add Query") {
-          let number = generateNewQueryNameNumber(prefix: "Name")
-          request.queries.append(.init(
-            name: "Name\(number)",
-            value: "Value\(number)"
-          ))
+        if request.queries.isEmpty {
+          LabeledContent("No queries") {
+            Button("Add Query") {
+              let number = generateNewQueryNameNumber(prefix: "Name")
+              request.queries.append(.init(
+                name: "Name\(number)",
+                value: "Value\(number)"
+              ))
+            }
+          }
+        } else {
+          Button("Add Query") {
+            let number = generateNewQueryNameNumber(prefix: "Name")
+            request.queries.append(.init(
+              name: "Name\(number)",
+              value: "Value\(number)"
+            ))
+          }
         }
         
         LabeledContent("Result URL", value: request.url?.absoluteString ?? "Invalid URL")
@@ -99,19 +114,31 @@ struct RequestDetailView: View {
             } set: { newValue in
               headerField.wrappedValue.name = .init(newValue)!
             })
-    
+            Divider()
             TextField("Value", text: headerField.value)
+            
+            Button("X", role: .destructive) {
+              request.headerFields.removeAll(where: { $0 == headerField.wrappedValue })
+            }
           }
         }
-        
+
         if request.headerFields.isEmpty {
-          Text("No headers")
-        }
-        
-        Menu("Add Header", systemImage: "list.dash") {
-          ForEach(NewHeader.allCases, id: \.self) { header in
-            Button(header.rawValue) {
-              addNewHeader(header: header)
+          LabeledContent("No headers") {
+            Menu("Add Header", systemImage: "list.dash") {
+              ForEach(NewHeader.allCases, id: \.self) { header in
+                Button(header.rawValue) {
+                  addNewHeader(header: header)
+                }
+              }
+            }
+          }
+        } else {
+          Menu("Add Header", systemImage: "list.dash") {
+            ForEach(NewHeader.allCases, id: \.self) { header in
+              Button(header.rawValue) {
+                addNewHeader(header: header)
+              }
             }
           }
         }
