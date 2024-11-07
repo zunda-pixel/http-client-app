@@ -17,6 +17,14 @@ extension File {
     request: .init(name: "Users", method: .post),
     folderId: Folder.githubUsers.id
   )
+  static let githubUsersDelete = Self(
+    request: .init(name: "Users", method: .delete),
+    folderId: Folder.githubUsers.id
+  )
+  static let githubUsersPut = Self(
+    request: .init(name: "Users", method: .put),
+    folderId: Folder.githubUsers.id
+  )
   static let githubRepositoriesGet = Self(
     request: .init(name: "Repositories", method: .get),
     folderId: Folder.githubRepositories.id

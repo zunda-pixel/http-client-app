@@ -12,6 +12,8 @@ final class ItemController {
     .folder(.aws),
     .file(.githubUsersGet),
     .file(.githubUsersPost),
+    .file(.githubUsersDelete),
+    .file(.githubUsersPut),
     .file(.githubRepositoriesGet),
     .file(.googleAuthGet),
   ]

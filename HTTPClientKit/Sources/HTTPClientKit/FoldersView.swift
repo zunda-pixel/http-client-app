@@ -24,17 +24,50 @@ struct FoldersView: View {
               Button("Add File") {
                 itemController.items.append(.file(.init(request: .init(name: "NewRequest1"), folderId: folder.id)))
               }
+              Button("Delete", role: .destructive) {
+                itemController.items.removeAll { $0.id.rawValue == folder.id.rawValue }
+              }
             }
             .id(folder.id)
         }
       case .file(let file):
-        Label("[\(file.request.method.rawValue)] \(file.request.name)", systemImage: "document")
-          .contextMenu {
-            Button("Delete", role: .destructive) {
-              itemController.items.removeAll { $0.id.rawValue == file.id.rawValue }
-            }
+        var color: Color {
+          switch file.request.method {
+          case .get: return .blue
+          case .post: return .green
+          case .put: return .orange
+          case .delete: return .red
+          case .patch: return .purple
+          case .head: return .pink
+          case .options: return .yellow
+          case .trace: return .gray
+          case .connect: return .black
+          default:
+            fatalError()
           }
-          .id(file.id)
+        }
+        LabeledContent {
+          Text(file.request.name)
+            .bold()
+        } label: {
+          Text(file.request.method.rawValue)
+            .bold()
+            .padding(.vertical, 2)
+            .frame(maxWidth: 70)
+            .background(color.opacity(0.7))
+            .cornerRadius(8)
+        }
+        .padding(4)
+        .overlay(
+          RoundedRectangle(cornerRadius: 8)
+            .stroke(color.opacity(0.7), lineWidth: 1)
+        )
+        .contextMenu {
+          Button("Delete", role: .destructive) {
+            itemController.items.removeAll { $0.id.rawValue == file.id.rawValue }
+          }
+        }
+        .id(file.id)
       }
     }
   }
