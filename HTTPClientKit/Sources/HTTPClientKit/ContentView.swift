@@ -3,18 +3,7 @@ import SwiftUI
 public struct ContentView: View {
   @State var resultState: ResultState = .init()
   @State var selectedItemId: Item.ID?
-  @State var allItems: [Item] = [
-    .folder(.github),
-    .folder(.githubUsers),
-    .folder(.githubRepositories),
-    .folder(.google),
-    .folder(.googleAuth),
-    .folder(.weather),
-    .folder(.aws),
-    .file(.githubUsersGet),
-    .file(.githubRepositoriesGet),
-    .file(.googleAuthGet),
-  ]
+  @State var itemController = ItemController()
   
   public init() { }
 
@@ -22,11 +11,11 @@ public struct ContentView: View {
     NavigationSplitView {
       List(selection: $selectedItemId) {
         FoldersView()
-          .environment(\.allItems, allItems)
+          .environment(\.allItems, itemController.items)
       }
     } content: {
       if let selectedItemId = selectedItemId,
-         let selectedItem = allItems.first(where: { $0.id == selectedItemId }) {
+         let selectedItem = itemController.items.first(where: { $0.id == selectedItemId }) {
         switch selectedItem {
         case .folder(let folder):
           Text(folder.name)
@@ -42,5 +31,6 @@ public struct ContentView: View {
       }
     }
     .environment(resultState)
+    .environment(itemController)
   }
 }
