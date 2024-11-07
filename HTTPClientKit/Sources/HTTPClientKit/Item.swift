@@ -1,20 +1,23 @@
 import Foundation
+import Tagged
 
 enum Item: Identifiable, Hashable, Sendable {
+  typealias ID = Tagged<Item, UUID>
+
   case folder(Folder)
   case file(File)
-  
-  var id: UUID {
+
+  var id: ID {
     switch self {
-    case .folder(let folder): return folder.id
-    case .file(let file): return file.id
+    case .folder(let folder): return .init(folder.id.rawValue)
+    case .file(let file): return .init(file.id.rawValue)
     }
   }
   
-  var parentId: UUID? {
+  var parentId: Folder.ID? {
     switch self {
-      case .folder(let folder): return folder.parentId
-      case .file(let file): return file.folderId
+    case .folder(let folder): return folder.parentId
+    case .file(let file): return file.folderId
     }
   }
 }

@@ -1,9 +1,11 @@
 import Foundation
 import HTTPTypes
 import HTTPTypesFoundation
+import Tagged
 
 struct Request: Sendable, Hashable, Identifiable {
-  let id: UUID = .init()
+  typealias ID = Tagged<Self, UUID>
+  let id: ID = .init()
   var name: String = ""
   var createdAt: Date = .now
   var updatedAt: Date = .now

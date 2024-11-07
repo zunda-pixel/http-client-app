@@ -11,6 +11,7 @@ final class ItemController {
     .folder(.weather),
     .folder(.aws),
     .file(.githubUsersGet),
+    .file(.githubUsersPost),
     .file(.githubRepositoriesGet),
     .file(.googleAuthGet),
   ]

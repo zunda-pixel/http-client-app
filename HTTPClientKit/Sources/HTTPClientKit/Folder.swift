@@ -1,9 +1,11 @@
 import Foundation
+import Tagged
 
 struct Folder: Identifiable, Hashable, Sendable {
-  let id: UUID = UUID()
+  typealias ID = Tagged<Self, UUID>
+  let id: ID = .init()
   var name: String
-  var parentId: UUID?
+  var parentId: ID?
 }
 
 extension Folder {
