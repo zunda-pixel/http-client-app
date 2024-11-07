@@ -3,7 +3,6 @@ import HTTPTypes
 
 struct RequestDetailView: View {
   @Environment(ResultState.self) var resultState
-  @Environment(NavigationRouter.self) var router
   @State var request: Request
   
   func generateNewHeaderName(number: Int = 1) -> String {

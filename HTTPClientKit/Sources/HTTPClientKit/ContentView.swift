@@ -2,35 +2,40 @@ import SwiftUI
 
 public struct ContentView: View {
   @State var resultState: ResultState = .init()
-  @State var router = NavigationRouter()
-  @State var selectedRequest: Request?
-  @State var requests: [Request] = [
-    .init(name: "Name1"),
-    .init(name: "Name2"),
-    .init(name: "Name3")
+  @State var selectedItemId: Item.ID?
+  @State var allItems: [Item] = [
+    .folder(.github),
+    .folder(.githubUsers),
+    .folder(.githubRepositories),
+    .folder(.google),
+    .folder(.googleAuth),
+    .folder(.weather),
+    .folder(.aws),
+    .file(.githubUsersGet),
+    .file(.githubRepositoriesGet),
+    .file(.googleAuthGet),
   ]
   
   public init() { }
 
   public var body: some View {
     NavigationSplitView {
-      List(requests, selection: $selectedRequest) { request in
-        RequestCell(request: request)
-          .id(request)
+      List(selection: $selectedItemId) {
+        FoldersView()
+          .environment(\.allItems, allItems)
       }
     } content: {
-      NavigationStack(path: $router.items) {
-        if let request = selectedRequest {
-          RequestDetailView(request: request)
-            .navigationDestination(for: NavigationRouter.Item.self) { item in
-              switch item {
-              case .requestDetail(let request):
-                RequestDetailView(request: request)
-              }
-            }
+      if let selectedItemId = selectedItemId,
+         let selectedItem = allItems.first(where: { $0.id == selectedItemId }) {
+        switch selectedItem {
+        case .folder(let folder):
+          Text(folder.name)
+        case .file(let file):
+          RequestDetailView(request: file.request)
         }
+      } else {
+        ContentUnavailableView("No item selected", systemImage: "house")
       }
-      .environment(router)
     } detail: {
       if let result = resultState.result {
         ResultDetailView(result: result)
