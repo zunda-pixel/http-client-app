@@ -13,6 +13,10 @@ public struct ContentView: View {
         FoldersView()
           .environment(\.allItems, itemController.items)
       }
+      .contextMenu {
+        Button("Add Folder") { itemController.items.append(.folder(.init(name: "NewFolder1"))) }
+        Button("Add File") { itemController.items.append(.file(.init(request: .init(name: "NewRequest1"), folderId: nil)))}
+      }
     } content: {
       if let selectedItemId = selectedItemId,
          let selectedItem = itemController.items.first(where: { $0.id == selectedItemId }) {

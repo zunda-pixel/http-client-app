@@ -3,7 +3,7 @@ import Foundation
 struct File: Identifiable, Hashable, Sendable {
   var request: Request
   var id: UUID { request.id }
-  var folderId: Folder.ID
+  var folderId: Folder.ID?
 }
 
 extension File {
