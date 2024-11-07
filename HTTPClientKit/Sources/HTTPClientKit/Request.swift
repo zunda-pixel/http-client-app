@@ -12,7 +12,7 @@ struct Request: Sendable, Hashable, Identifiable {
   var method: HTTPRequest.Method = .get
   var baseUrl: String = "https://www.githubstatus.com/api/v2/status.json"
   var queries: [URLQueryItem] = []
-  
+
   var url: URL? {
     if queries.isEmpty {
       URL(string: baseUrl)
@@ -20,10 +20,10 @@ struct Request: Sendable, Hashable, Identifiable {
       URL(string: baseUrl)?.appending(queryItems: queries)
     }
   }
-  
+
   var httpRequest: HTTPRequest? {
     guard let url else { return nil }
-    
+
     return HTTPRequest(
       method: method,
       url: url,

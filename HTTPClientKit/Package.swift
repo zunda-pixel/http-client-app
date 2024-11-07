@@ -5,13 +5,13 @@ import PackageDescription
 let package = Package(
   name: "HTTPClientKit",
   platforms: [
-    .macOS(.v15),
+    .macOS(.v15)
   ],
   products: [
     .library(
       name: "HTTPClientKit",
       targets: ["HTTPClientKit"]
-    ),
+    )
   ],
   dependencies: [
     .package(url: "https://github.com/apple/swift-http-types.git", from: "1.3.0"),

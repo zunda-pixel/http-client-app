@@ -2,7 +2,7 @@ import SwiftUI
 
 struct RequestCell: View {
   var request: Request
-  
+
   var body: some View {
     VStack(alignment: .leading) {
       Text(request.name)

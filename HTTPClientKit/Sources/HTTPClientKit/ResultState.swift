@@ -1,6 +1,6 @@
-import Observation
-import HTTPTypes
 import Foundation
+import HTTPTypes
+import Observation
 
 @Observable
 final class ResultState {

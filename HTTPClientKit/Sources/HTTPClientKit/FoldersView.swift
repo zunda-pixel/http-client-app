@@ -1,3 +1,4 @@
+import HTTPTypes
 import SwiftUI
 
 extension EnvironmentValues {
@@ -8,7 +9,7 @@ struct FoldersView: View {
   @Environment(ItemController.self) var itemController
   @Environment(\.allItems) var allItems
   var parentId: Folder.ID? = nil
-  
+
   var body: some View {
     ForEach(self.allItems.filter { $0.parentId == self.parentId }) { item in
       switch item {
@@ -22,7 +23,9 @@ struct FoldersView: View {
                 itemController.items.append(.folder(.init(name: "NewFolder1", parentId: folder.id)))
               }
               Button("Add File") {
-                itemController.items.append(.file(.init(request: .init(name: "NewRequest1"), folderId: folder.id)))
+                itemController.items.append(
+                  .file(.init(request: .init(name: "NewRequest1"), folderId: folder.id))
+                )
               }
               Button("Delete", role: .destructive) {
                 itemController.items.removeAll { $0.id.rawValue == folder.id.rawValue }
@@ -31,7 +34,7 @@ struct FoldersView: View {
             .id(folder.id)
         }
       case .file(let file):
-        
+
         LabeledContent {
           Text(file.request.name)
             .bold()
@@ -52,7 +55,7 @@ struct FoldersView: View {
           Button("Delete", role: .destructive) {
             itemController.items.removeAll { $0.id.rawValue == file.id.rawValue }
           }
-          
+
           Button("Duplicate") {
             var newRequest = file.request
             newRequest.id = .init()
@@ -64,8 +67,6 @@ struct FoldersView: View {
     }
   }
 }
-
-import HTTPTypes
 
 extension HTTPRequest.Method {
   var color: Color {

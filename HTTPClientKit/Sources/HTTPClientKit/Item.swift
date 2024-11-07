@@ -13,7 +13,7 @@ enum Item: Identifiable, Hashable, Sendable {
     case .file(let file): return .init(file.id.rawValue)
     }
   }
-  
+
   var parentId: Folder.ID? {
     switch self {
     case .folder(let folder): return folder.parentId
