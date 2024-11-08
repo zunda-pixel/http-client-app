@@ -11,6 +11,10 @@ struct FoldersView: View {
   }
   var parentId: Folder.ID? = nil
 
+  @State var selectedFolder: Folder?
+  @State var editingFolderName: String?
+  @State var isPresentedRenameAlert = false
+  
   var body: some View {
     ForEach(self.allItems.filter { $0.parentId == self.parentId }) { item in
       switch item {
@@ -20,6 +24,13 @@ struct FoldersView: View {
         } label: {
           Label(folder.name, systemImage: "folder")
             .contextMenu {
+              Section {
+                Button("Rename Folder") {
+                  selectedFolder = folder
+                  editingFolderName = folder.name
+                  isPresentedRenameAlert.toggle()
+                }
+              }
               Section {
                 Button("Add Folder") {
                   let newFolder = Folder(name: "NewFolder1", parentId: folder.id)
@@ -38,6 +49,20 @@ struct FoldersView: View {
               }
             }
             .id(folder.id)
+        }
+        .alert(
+          "Rename Folder",
+          isPresented: $isPresentedRenameAlert,
+          presenting: editingFolderName
+        ) { folderName in
+          TextField("Folder Name", text: .init(get: { self.editingFolderName ?? folderName }, set: { self.editingFolderName = $0 }))
+          Button("OK") { selectedFolder?.name = editingFolderName ?? folderName }
+          Button("Cancel", role: .cancel) {
+            selectedFolder = nil
+            editingFolderName = nil
+          }
+        } message: { _ in
+          Text("Please enter a folder name.")
         }
       case .file(let file):
         LabeledContent {
