@@ -15,3 +15,11 @@ struct RequestCell: View {
     }
   }
 }
+
+#Preview {
+  List {
+    ForEach(0..<5) { i in
+      RequestCell(request: .init(name: "NewRequest\(i)", baseUrl: "https://apple\(i).com/\(i)"))
+    }
+  }
+}

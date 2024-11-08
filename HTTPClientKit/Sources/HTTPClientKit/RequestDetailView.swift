@@ -90,7 +90,7 @@ struct RequestDetailView: View {
         }
 
         if request.queries.isEmpty {
-          LabeledContent("No queries") {
+          LabeledContent("No Queries") {
             Button("Add Query") {
               let number = generateNewQueryNameNumber(prefix: "Name")
               request.queries.append(
@@ -134,7 +134,7 @@ struct RequestDetailView: View {
         }
 
         if request.headerFields.isEmpty {
-          LabeledContent("No headers") {
+          LabeledContent("No Headers") {
             Menu("Add Header", systemImage: "list.dash") {
               ForEach(NewHeader.allCases, id: \.self) { header in
                 Button(header.rawValue) {
@@ -158,7 +158,7 @@ struct RequestDetailView: View {
         Task { await execute() }
       }
 
-      Section("Info") {
+      Section("Information") {
         LabeledContent("CreatedAt") {
           Text(request.createdAt, style: .date)
         }
@@ -189,5 +189,6 @@ extension HTTPRequest.Method: @retroactive CaseIterable, @retroactive Identifiab
 }
 
 #Preview {
-  RequestDetailView(request: .init())
+  RequestDetailView(request: .init(name: "Test", baseUrl: "https://api.github.com/users"))
+    .environment(ResultState())
 }

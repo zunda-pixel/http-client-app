@@ -6,11 +6,11 @@ import Tagged
 struct Request: Sendable, Hashable, Identifiable {
   typealias ID = Tagged<Self, UUID>
   var id: ID = .init()
-  var name: String = ""
+  var name: String
   var createdAt: Date = .now
   var updatedAt: Date = .now
   var method: HTTPRequest.Method = .get
-  var baseUrl: String = "https://www.githubstatus.com/api/v2/status.json"
+  var baseUrl: String
   var queries: [URLQueryItem] = []
 
   var url: URL? {

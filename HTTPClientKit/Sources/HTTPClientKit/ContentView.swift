@@ -17,7 +17,7 @@ public struct ContentView: View {
         Button("Add Folder") { itemController.items.append(.folder(.init(name: "NewFolder1"))) }
         Button("Add File") {
           itemController.items.append(
-            .file(.init(request: .init(name: "NewRequest1"), folderId: nil))
+            .file(.init(request: .init(name: "NewRequest1", baseUrl: "https://apple.com"), folderId: nil))
           )
         }
       }

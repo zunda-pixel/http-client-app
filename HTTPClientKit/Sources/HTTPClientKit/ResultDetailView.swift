@@ -6,7 +6,7 @@ struct ResultDetailView: View {
 
   var body: some View {
     Form {
-      Section("Info") {
+      Section("Information") {
         let dateFormatter: ISO8601DateFormatter = {
           let dateFormatter = ISO8601DateFormatter()
           dateFormatter.formatOptions.insert(.withFractionalSeconds)
@@ -78,4 +78,20 @@ extension ResultDetailView {
       Text(error.localizedDescription)
     }
   }
+}
+
+#Preview("Success") {
+  ResultDetailView(result: .init(
+    startTime: .now,
+    endTime: .now.addingTimeInterval(123.456),
+    result: .success((.init(), .init(status: .ok)))
+  ))
+}
+
+#Preview("Failure") {
+  ResultDetailView(result: .init(
+    startTime: .now,
+    endTime: .now.addingTimeInterval(123.456),
+    result: .failure(NSError(domain: "Failed something", code: 1))
+  ))
 }

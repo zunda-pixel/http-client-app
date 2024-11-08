@@ -31,7 +31,7 @@ struct FoldersView: View {
               Section {
                 Button("Add File") {
                   itemController.items.append(
-                    .file(.init(request: .init(name: "NewRequest1"), folderId: folder.id))
+                    .file(.init(request: .init(name: "NewRequest1", baseUrl: "https://apple.com"), folderId: folder.id))
                   )
                 }
               }
@@ -68,7 +68,7 @@ struct FoldersView: View {
 
           Button("New Request") {
             itemController.items.append(
-              .file(.init(request: .init(name: "NewRequest1"), folderId: file.folderId))
+              .file(.init(request: .init(name: "NewRequest1", baseUrl: "https://apple.com"), folderId: file.folderId))
             )
           }
         }
@@ -93,5 +93,15 @@ extension HTTPRequest.Method {
     default:
       fatalError()
     }
+  }
+}
+
+#Preview {
+  @Previewable @State var selectedItemId: Item.ID?
+  var itemController = ItemController()
+  List(selection: $selectedItemId) {
+    FoldersView()
+      .environment(itemController)
+      .environment(\.allItems, itemController.items)
   }
 }
