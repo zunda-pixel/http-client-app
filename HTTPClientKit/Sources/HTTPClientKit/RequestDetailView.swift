@@ -3,7 +3,7 @@ import SwiftUI
 
 struct RequestDetailView: View {
   @Environment(ResultState.self) var resultState
-  @State var request: Request
+  @Binding var request: Request
 
   func generateNewHeaderName(number: Int = 1) -> String {
     let newName = "Name\(number)"
@@ -189,6 +189,7 @@ extension HTTPRequest.Method: @retroactive CaseIterable, @retroactive Identifiab
 }
 
 #Preview {
-  RequestDetailView(request: .init(name: "Test", baseUrl: "https://api.github.com/users"))
+  @Previewable @State var request = Request(name: "Test", baseUrl: "https://api.github.com/users")
+  RequestDetailView(request: $request)
     .environment(ResultState())
 }

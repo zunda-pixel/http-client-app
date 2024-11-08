@@ -1,13 +1,14 @@
 import HTTPTypes
 import SwiftUI
-
-extension EnvironmentValues {
-  @Entry var allItems: [Item] = []
-}
+import SwiftData
 
 struct FoldersView: View {
-  @Environment(ItemController.self) var itemController
-  @Environment(\.allItems) var allItems
+  @Environment(\.modelContext) var modelContext
+  @Query var folders: [Folder]
+  @Query var files: [File]
+  var allItems: [Item] {
+    folders.map(Item.folder) + files.map(Item.file)
+  }
   var parentId: Folder.ID? = nil
 
   var body: some View {
@@ -21,18 +22,18 @@ struct FoldersView: View {
             .contextMenu {
               Section {
                 Button("Add Folder") {
-                  itemController.items.append(.folder(.init(name: "NewFolder1", parentId: folder.id)))
+                  let newFolder = Folder(name: "NewFolder1", parentId: folder.id)
+                  modelContext.insert(newFolder)
                 }
                 
                 Button("Delete Folder", role: .destructive) {
-                  itemController.items.removeAll { $0.id.rawValue == folder.id.rawValue }
+                  modelContext.delete(folder)
                 }
               }
               Section {
                 Button("Add File") {
-                  itemController.items.append(
-                    .file(.init(request: .init(name: "NewRequest1", baseUrl: "https://apple.com"), folderId: folder.id))
-                  )
+                  let newFile = File(request: .init(name: "NewRequest1", baseUrl: "https://apple.com"), folderId: folder.id)
+                  modelContext.insert(newFile)
                 }
               }
             }
@@ -57,19 +58,19 @@ struct FoldersView: View {
         )
         .contextMenu {
           Button("Delete Request", role: .destructive) {
-            itemController.items.removeAll { $0.id.rawValue == file.id.rawValue }
+            modelContext.delete(file)
           }
 
           Button("Duplicate Request") {
             var newRequest = file.request
             newRequest.id = .init()
-            itemController.items.append(.file(.init(request: newRequest, folderId: file.folderId)))
+            let newFile = File(request: newRequest, folderId: file.folderId)
+            modelContext.insert(newFile)
           }
 
           Button("New Request") {
-            itemController.items.append(
-              .file(.init(request: .init(name: "NewRequest1", baseUrl: "https://apple.com"), folderId: file.folderId))
-            )
+            let newFile = File(request: Request(name: "NewRequest1", baseUrl: "https://apple.com"), folderId: file.folderId)
+            modelContext.insert(newFile)
           }
         }
         .id(file.id)
@@ -98,10 +99,7 @@ extension HTTPRequest.Method {
 
 #Preview {
   @Previewable @State var selectedItemId: Item.ID?
-  var itemController = ItemController()
-  List(selection: $selectedItemId) {
+  return List(selection: $selectedItemId) {
     FoldersView()
-      .environment(itemController)
-      .environment(\.allItems, itemController.items)
   }
 }

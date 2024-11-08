@@ -1,34 +1,38 @@
 import SwiftUI
+import SwiftData
 
 public struct ContentView: View {
   @State var resultState: ResultState = .init()
   @State var selectedItemId: Item.ID?
-  @State var itemController = ItemController()
-
+  @Environment(\.modelContext) var modelContext
+  @Query var folders: [Folder]
+  @Query var files: [File]
+  
   public init() {}
 
   public var body: some View {
     NavigationSplitView {
       List(selection: $selectedItemId) {
         FoldersView()
-          .environment(\.allItems, itemController.items)
       }
       .contextMenu {
-        Button("Add Folder") { itemController.items.append(.folder(.init(name: "NewFolder1"))) }
+        Button("Add Folder") {
+          let newFolder = Folder(name: "NewFolder1")
+          modelContext.insert(newFolder)
+        }
         Button("Add File") {
-          itemController.items.append(
-            .file(.init(request: .init(name: "NewRequest1", baseUrl: "https://apple.com"), folderId: nil))
-          )
+          let newFile = File(request: .init(name: "NewRequest1", baseUrl: "https://apple.com"))
+          modelContext.insert(newFile)
         }
       }
     } content: {
       if let selectedItemId = selectedItemId,
-        let selectedItem = itemController.items.first(where: { $0.id == selectedItemId }) {
+         let selectedItem = (folders.map(Item.folder) + files.map(Item.file)).first(where: { $0.id == selectedItemId }) {
         switch selectedItem {
         case .folder(let folder):
           Text(folder.name)
         case .file(let file):
-          RequestDetailView(request: file.request)
+          RequestDetailView(request: .init(get: { file.request}, set: { file.request = $0 }))
         }
       } else {
         ContentUnavailableView("No item selected", systemImage: "house")
@@ -39,6 +43,5 @@ public struct ContentView: View {
       }
     }
     .environment(resultState)
-    .environment(itemController)
   }
 }
