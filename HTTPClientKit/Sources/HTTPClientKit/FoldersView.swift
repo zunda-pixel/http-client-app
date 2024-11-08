@@ -19,22 +19,26 @@ struct FoldersView: View {
         } label: {
           Label(folder.name, systemImage: "folder")
             .contextMenu {
-              Button("Add Folder") {
-                itemController.items.append(.folder(.init(name: "NewFolder1", parentId: folder.id)))
+              Section {
+                Button("Add Folder") {
+                  itemController.items.append(.folder(.init(name: "NewFolder1", parentId: folder.id)))
+                }
+                
+                Button("Delete Folder", role: .destructive) {
+                  itemController.items.removeAll { $0.id.rawValue == folder.id.rawValue }
+                }
               }
-              Button("Add File") {
-                itemController.items.append(
-                  .file(.init(request: .init(name: "NewRequest1"), folderId: folder.id))
-                )
-              }
-              Button("Delete", role: .destructive) {
-                itemController.items.removeAll { $0.id.rawValue == folder.id.rawValue }
+              Section {
+                Button("Add File") {
+                  itemController.items.append(
+                    .file(.init(request: .init(name: "NewRequest1"), folderId: folder.id))
+                  )
+                }
               }
             }
             .id(folder.id)
         }
       case .file(let file):
-
         LabeledContent {
           Text(file.request.name)
             .bold()
@@ -52,14 +56,20 @@ struct FoldersView: View {
             .stroke(file.request.method.color.opacity(0.7), lineWidth: 1)
         )
         .contextMenu {
-          Button("Delete", role: .destructive) {
+          Button("Delete Request", role: .destructive) {
             itemController.items.removeAll { $0.id.rawValue == file.id.rawValue }
           }
 
-          Button("Duplicate") {
+          Button("Duplicate Request") {
             var newRequest = file.request
             newRequest.id = .init()
             itemController.items.append(.file(.init(request: newRequest, folderId: file.folderId)))
+          }
+
+          Button("New Request") {
+            itemController.items.append(
+              .file(.init(request: .init(name: "NewRequest1"), folderId: file.folderId))
+            )
           }
         }
         .id(file.id)
