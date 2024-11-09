@@ -54,6 +54,7 @@ extension ResultDetailView {
     let data: Data
     let response: HTTPResponse
     @State var isExpanded = false
+    @State var stringEncoding: String.Encoding = .utf8
 
     var body: some View {
       LabeledContent("Status Code", value: response.status.code.description)
@@ -64,10 +65,37 @@ extension ResultDetailView {
           TableColumn("Value", value: \.value)
         }
       }
-
-      Section("Data") {
-        Text(String(decoding: data, as: UTF8.self))
-          .frame(maxWidth: .infinity, alignment: .leading)
+      
+      Section {
+        if let string = String(data: data, encoding: .utf8) {
+          Text(string)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .overlay(alignment: .topTrailing) {
+              Button {
+                #if canImport(UIKit)
+                UIPasteboard.general.string = string
+                #elseif canImport(AppKit)
+                NSPasteboard.general.clearContents()
+                NSPasteboard.general.setString(string, forType: .string)
+                #endif
+              } label: {
+                Label("Copy", systemImage: "doc.on.doc")
+              }
+            }
+        } else {
+          Text("Failed to decode data")
+        }
+      } header: {
+        HStack {
+          Text("Data")
+          Divider()
+          Picker("Encoding", selection: $stringEncoding) {
+            ForEach(String.Encoding.allCases, id: \.label) { encoding in
+              Text(encoding.label)
+                .tag(encoding)
+            }
+          }
+        }
       }
     }
   }
@@ -78,6 +106,11 @@ extension ResultDetailView {
       Text(error.localizedDescription)
     }
   }
+}
+
+extension String.Encoding {
+  static var allCases: [String.Encoding]  { [.utf8, .shiftJIS, .ascii, .isoLatin1, .nonLossyASCII, .utf16, .utf32] }
+  var label: String { String.localizedName(of: self) }
 }
 
 #Preview("Success") {
