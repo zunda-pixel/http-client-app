@@ -4,7 +4,9 @@ import SwiftUI
 struct RequestDetailView: View {
   @Environment(ResultState.self) var resultState
   @Binding var request: Request
-
+  @State var isPresentedNewHeaderAlert = false
+  @State var newHeaderField: HTTPField?
+  
   func generateNewHeaderName(number: Int = 1) -> String {
     let newName = "Name\(number)"
     if request.headerFields.map(\.name.rawName).contains(newName) {
@@ -22,15 +24,16 @@ struct RequestDetailView: View {
   }
 
   enum NewHeader: String, CaseIterable {
-    case empty = "Empty"
+    case new = "New"
     case authorization = "Authorization"
     case contentType = "Content-Type"
   }
 
   func addNewHeader(header: NewHeader) {
     switch header {
-    case .empty:
-      request.headerFields.append(.init(name: .init(generateNewHeaderName())!, value: ""))
+    case .new:
+      self.newHeaderField = .init(name: .init("Name")!, value: "")
+      isPresentedNewHeaderAlert.toggle()
     case .authorization:
       request.headerFields.append(.init(name: .authorization, value: ""))
     case .contentType:
@@ -117,18 +120,11 @@ struct RequestDetailView: View {
       Section("Headers") {
         ForEach($request.headerFields) { headerField in
           HStack {
-            TextField(
-              "Name",
-              text: Binding<String> {
-                headerField.wrappedValue.name.rawName
-              } set: { newValue in
-                headerField.wrappedValue.name = .init(newValue)!
-              })
+            LabeledContent("Name", value: headerField.wrappedValue.name.rawName)
             Divider()
             TextField("Value", text: headerField.value)
-
             Button("X", role: .destructive) {
-              request.headerFields.removeAll(where: { $0 == headerField.wrappedValue })
+              request.headerFields[headerField.wrappedValue.name] = nil
             }
           }
         }
@@ -163,6 +159,21 @@ struct RequestDetailView: View {
           Text(request.createdAt, style: .date)
         }
       }
+    }
+    .alert("Add New Header", isPresented: $isPresentedNewHeaderAlert, presenting: newHeaderField) { headerField in
+      TextField("Name", text: .init(
+        get: { self.newHeaderField?.name.rawName ?? headerField.name.rawName },
+        set: { newValue in
+          guard let name = HTTPField.Name(newValue) else { return }
+          self.newHeaderField?.name = name
+        }
+      ))
+      TextField("Value", text: .init(get: { self.newHeaderField?.value ?? headerField.value }, set: { self.newHeaderField?.value = $0 }))
+      Button("OK") {
+        request.headerFields[newHeaderField?.name ?? headerField.name] = newHeaderField?.value ?? headerField.value
+        newHeaderField = nil
+      }
+      Button("Cancel", role: .cancel) { newHeaderField = nil }
     }
     .formStyle(.grouped)
     .navigationTitle("Request \(request.name)")
