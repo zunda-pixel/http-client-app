@@ -14,11 +14,11 @@ struct ItemView: View {
   
   init(
     parentFolder: Folder,
-    childId: UUID
+    itemId: UUID
   ) {
     self.parentFolder = parentFolder
-    _folders = .init(filter: #Predicate<Folder> { $0.id == childId })
-    _files = .init(filter: #Predicate<File> { $0.id == childId })
+    _folders = .init(filter: #Predicate<Folder> { $0.id == itemId })
+    _files = .init(filter: #Predicate<File> { $0.id == itemId })
   }
 
   var body: some View {
@@ -117,7 +117,7 @@ struct FoldersView: View {
 
   var body: some View {
     ForEach(parentFolder.childrenIds, id: \.self) { childId in
-      ItemView(parentFolder: parentFolder, childId: childId)
+      ItemView(parentFolder: parentFolder, itemId: childId)
     }
   }
 }
