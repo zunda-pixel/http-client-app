@@ -1,7 +1,6 @@
 import Foundation
 import HTTPTypes
 import HTTPTypesFoundation
-import Tagged
 
 struct Request: Sendable, Hashable, Identifiable, Codable {
   typealias ID = UUID
