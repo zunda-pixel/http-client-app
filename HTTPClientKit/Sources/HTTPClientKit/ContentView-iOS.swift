@@ -7,7 +7,8 @@ public struct ContentView: View {
   @Environment(\.modelContext) var modelContext
   @Query(filter: #Predicate<Folder> { $0.name == "Root"}) var folders: [Folder]
   @State var router = NavigationRouter()
-  
+  @State var isPresentedSettingsView: Bool = false
+
   public init() {
     
   }
@@ -25,6 +26,9 @@ public struct ContentView: View {
             ResultDetailView(result: result)
           }
         }
+        .sheet(isPresented: $isPresentedSettingsView) {
+          SettingsView()
+        }
         .toolbar {
           ToolbarItemGroup {
             Menu {
@@ -38,10 +42,14 @@ public struct ContentView: View {
                 modelContext.insert(file)
                 rootFolder.childrenIds.append(file.id)
               }
+              Button {
+                isPresentedSettingsView.toggle()
+              } label: {
+                Label("Settings", systemImage: "gear")
+              }
             } label: {
-              Label("Add", systemImage: "plus")
+              Label("Menu", systemImage: "ellipsis.circle")
             }
-            EditButton()
           }
         }
       } else {

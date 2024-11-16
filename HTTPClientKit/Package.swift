@@ -18,6 +18,7 @@ let package = Package(
     .package(url: "https://github.com/apple/swift-http-types.git", from: "1.3.1"),
     .package(url: "https://github.com/apple/swift-algorithms.git", from: "1.2.0"),
     .package(url: "https://github.com/apple/swift-collections.git", from: "1.1.4"),
+    .package(url: "https://github.com/zunda-pixel/LicenseProvider", from: "1.3.1"),
   ],
   targets: [
     .target(
@@ -27,6 +28,9 @@ let package = Package(
         .product(name: "HTTPTypesFoundation", package: "swift-http-types"),
         .product(name: "Algorithms", package: "swift-algorithms"),
         .product(name: "OrderedCollections", package: "swift-collections"),
+      ],
+      plugins: [
+        .plugin(name: "LicenseProviderPlugin", package: "LicenseProvider"),
       ]
     ),
     .testTarget(
