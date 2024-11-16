@@ -357,7 +357,8 @@ struct RequestDetailView: View {
         }
       }
     }
-    .navigationTitle(request.name)
+    .navigationTitle("[\(request.method.rawValue)] \(request.name)")
+    .navigationBarTitleDisplayMode(.inline)
   }
 }
 

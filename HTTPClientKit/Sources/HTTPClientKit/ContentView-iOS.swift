@@ -18,6 +18,7 @@ public struct ContentView: View {
         List {
           FoldersView(parentFolder: rootFolder)
         }
+        .navigationTitle("HTTP Requests")
         .navigationDestination(for: NavigationRouter.Route.self) { route in
           switch route {
           case .request(let file):
@@ -32,20 +33,24 @@ public struct ContentView: View {
         .toolbar {
           ToolbarItemGroup {
             Menu {
-              Button("Add Folder") {
-                let folder = Folder(name: "NewFolder1")
-                modelContext.insert(folder)
-                rootFolder.childrenIds.append(folder.id)
+              Section {
+                Button("Add Folder") {
+                  let folder = Folder(name: "NewFolder1")
+                  modelContext.insert(folder)
+                  rootFolder.childrenIds.append(folder.id)
+                }
+                Button("Add File") {
+                  let file = File(request: .init(name: "NewRequest1", baseUrl: "https://apple.com"))
+                  modelContext.insert(file)
+                  rootFolder.childrenIds.append(file.id)
+                }
               }
-              Button("Add File") {
-                let file = File(request: .init(name: "NewRequest1", baseUrl: "https://apple.com"))
-                modelContext.insert(file)
-                rootFolder.childrenIds.append(file.id)
-              }
-              Button {
-                isPresentedSettingsView.toggle()
-              } label: {
-                Label("Settings", systemImage: "gear")
+              Section {
+                Button {
+                  isPresentedSettingsView.toggle()
+                } label: {
+                  Label("Settings", systemImage: "gear")
+                }
               }
             } label: {
               Label("Menu", systemImage: "ellipsis.circle")

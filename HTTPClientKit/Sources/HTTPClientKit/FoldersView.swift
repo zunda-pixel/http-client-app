@@ -199,7 +199,18 @@ struct ItemView: View {
         Text("Please enter a folder name.")
       }
     } else if let file = files.first {
-      Label(file.request.name, systemImage: "document")
+      HStack {
+        Text(file.request.method.rawValue)
+          .bold()
+          .foregroundStyle(.white)
+          .frame(minWidth: 80)
+          .padding(.horizontal, 8)
+          .padding(.vertical, 4)
+          .background(file.request.method.color.opacity(0.8))
+          .cornerRadius(8)
+        
+        Text(file.request.name)
+      }
         .contentShape(.rect)
         .onTapGesture {
           router.routes.append(.request(file))
