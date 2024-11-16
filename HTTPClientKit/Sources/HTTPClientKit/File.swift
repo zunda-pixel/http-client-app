@@ -14,7 +14,3 @@ final public class File: Identifiable, Hashable, @unchecked Sendable {
     self.request = request
   }
 }
-
-extension File {
-  
-}

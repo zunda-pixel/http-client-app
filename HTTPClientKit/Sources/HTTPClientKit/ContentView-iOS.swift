@@ -34,15 +34,19 @@ public struct ContentView: View {
           ToolbarItemGroup {
             Menu {
               Section {
-                Button("Add Folder") {
+                Button {
                   let folder = Folder(name: "NewFolder1")
                   modelContext.insert(folder)
                   rootFolder.childrenIds.append(folder.id)
+                } label: {
+                  Label("Add Folder", systemImage: "folder.badge.plus")
                 }
-                Button("Add File") {
+                Button {
                   let file = File(request: .init(name: "NewRequest1", baseUrl: "https://apple.com"))
                   modelContext.insert(file)
                   rootFolder.childrenIds.append(file.id)
+                } label: {
+                  Label("Add File", systemImage: "doc.badge.plus")
                 }
               }
               Section {

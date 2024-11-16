@@ -40,29 +40,36 @@ struct ItemView: View {
         Label(folder.name, systemImage: "folder")
           .contextMenu {
             Section {
-              Button("Rename Folder") {
+              Button {
                 selectedFolder = folder
                 editingFolderName = folder.name
                 isPresentedRenameAlert.toggle()
+              } label: {
+                Label("Rename", systemImage: "pencil")
               }
             }
             Section {
-              Button("Add Folder") {
+              Button {
                 let newFolder = Folder(name: "NewFolder1")
                 modelContext.insert(newFolder)
                 folder.childrenIds.append(newFolder.id)
+              } label: {
+                Label("Add Folder", systemImage: "folder.badge.plus")
               }
-              
-              Button("Delete Folder", role: .destructive) {
-                folder.childrenIds.removeAll(where: { $0 == folder.id })
-                modelContext.delete(folder)
-              }
-            }
-            Section {
-              Button("Add File") {
+              Button {
                 let newFile = File(request: .init(name: "NewRequest1", baseUrl: "https://apple.com"))
                 modelContext.insert(newFile)
                 folder.childrenIds.append(newFile.id)
+              } label: {
+                Label("Add File", systemImage: "doc.badge.plus")
+              }
+            }
+            Section {
+              Button(role: .destructive) {
+                folder.childrenIds.removeAll(where: { $0 == folder.id })
+                modelContext.delete(folder)
+              } label: {
+                Label("Delete", systemImage: "trash")
               }
             }
           }
@@ -99,23 +106,33 @@ struct ItemView: View {
           .stroke(file.request.method.color.opacity(0.7), lineWidth: 1)
       )
       .contextMenu {
-        Button("Delete Request", role: .destructive) {
-          parentFolder.childrenIds.removeAll(where: { $0 == file.id })
-          modelContext.delete(file)
+        Section {
+          Button {
+            var newRequest = file.request
+            newRequest.id = .init()
+            let newFile = File(request: newRequest)
+            modelContext.insert(newFile)
+            parentFolder.childrenIds.append(newFile.id)
+          } label: {
+            Label("Duplicate Request", systemImage: "doc.on.doc")
+          }
+          
+          Button {
+            let newFile = File(request: Request(name: "NewRequest1", baseUrl: "https://apple.com"))
+            modelContext.insert(newFile)
+            parentFolder.childrenIds.append(newFile.id)
+          } label: {
+            Label("New Request", systemImage: "doc.badge.plus")
+          }
         }
         
-        Button("Duplicate Request") {
-          var newRequest = file.request
-          newRequest.id = .init()
-          let newFile = File(request: newRequest)
-          modelContext.insert(newFile)
-          parentFolder.childrenIds.append(newFile.id)
-        }
-        
-        Button("New Request") {
-          let newFile = File(request: Request(name: "NewRequest1", baseUrl: "https://apple.com"))
-          modelContext.insert(newFile)
-          parentFolder.childrenIds.append(newFile.id)
+        Section {
+          Button(role: .destructive) {
+            parentFolder.childrenIds.removeAll(where: { $0 == file.id })
+            modelContext.delete(file)
+          } label: {
+            Label("Delete Request", systemImage: "trash")
+          }
         }
       }
       .id(file.id)

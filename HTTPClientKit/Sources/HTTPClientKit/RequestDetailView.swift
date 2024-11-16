@@ -6,12 +6,12 @@ import Algorithms
 struct RequestDetailView: View {
   @Environment(ResultState.self) var resultState
   @Binding var request: Request
-  @State var isPresentedNewHeaderAlert = false
-  @State var newHeaderField: HTTPField?
-  
+  @State var bodyString = ""
+  @State var useBody = false
+
   func generateNewHeaderName(number: Int = 1) -> String {
     let newName = "Name\(number)"
-    if request.headerFields.map(\.name.rawName).contains(newName) {
+    if request.headerFields.map(\.item.key).contains(newName) {
       return generateNewHeaderName(number: number + 1)
     }
     return newName
@@ -19,7 +19,7 @@ struct RequestDetailView: View {
 
   func generateNewQueryNameNumber(prefix: String, number: Int = 1) -> Int {
     let newName = "\(prefix)\(number)"
-    if request.queries.map(\.name).contains(newName) {
+    if request.queries.map(\.item).map(\.key).contains(newName) {
       return generateNewQueryNameNumber(prefix: prefix, number: number + 1)
     }
     return number
@@ -28,12 +28,11 @@ struct RequestDetailView: View {
   func addNewHeader(header: NewHeader) {
     switch header {
     case .new:
-      self.newHeaderField = .init(name: .init("Name")!, value: "")
-      isPresentedNewHeaderAlert.toggle()
+      request.headerFields.append(.init(item: .init(key: "", value: "")))
     case .authorization:
-      request.headerFields.append(.init(name: .authorization, value: ""))
+      request.headerFields.append(.init(item: .init(key: HTTPField.Name.authorization.rawName, value: "")))
     case .contentType:
-      request.headerFields.append(.init(name: .contentType, value: ""))
+      request.headerFields.append(.init(item: .init(key: HTTPField.Name.contentType.rawName, value: "")))
     }
   }
 
@@ -67,87 +66,100 @@ struct RequestDetailView: View {
         Text("HTTP Method")
       }
 
-      Section("URL & Queries") {
+      Section("URL") {
+        LabeledContent("URL", value: request.url?.absoluteString ?? "Invalid URL")
+        
         TextField("Base URL", text: $request.baseUrl)
-
-        ForEach($request.queries, id: \.self) { queryItem in
-          HStack {
-            TextField("Name", text: queryItem.name)
-            Divider()
-            TextField(
-              "Value",
-              text: Binding<String> {
-                queryItem.wrappedValue.value ?? ""
-              } set: { newValue in
-                queryItem.wrappedValue.value = newValue
-              })
-
-            Button("X", role: .destructive) {
-              request.queries.removeAll(where: { $0 == queryItem.wrappedValue })
+      }
+      
+      Section("Paths") {
+        ForEach($request.paths.indexed(), id: \.element.id) { i,  pathItem in
+          TextField("Path\(i)", text: pathItem.item)
+            .contentShape(.rect)
+            .contextMenu {
+              Button {
+                request.paths.removeAll { $0.id == pathItem.id }
+              } label: {
+                Label("Delete", systemImage: "trash")
+              }
+            }
+        }
+        
+        Button {
+          request.paths.append(.init(item: ""))
+        } label: {
+          Label("Add Path", systemImage: "plus")
+        }
+      }
+      
+      Section("Queries") {
+        Table($request.queries) {
+          TableColumn("Name") { queryItem in
+            TextField("Name", text: queryItem.item.key)
+              .labelsHidden()
+          }
+          
+          TableColumn("Value") { queryItem in
+            TextField("Value", text: queryItem.item.value)
+              .labelsHidden()
+          }
+          
+          TableColumn("Actions") { queryItem in
+            Button {
+              request.queries.removeAll { $0.id == queryItem.id }
+            } label: {
+              Label("Delete", systemImage: "trash")
             }
           }
         }
 
-        if request.queries.isEmpty {
-          LabeledContent("No Queries") {
-            Button("Add Query") {
-              let number = generateNewQueryNameNumber(prefix: "Name")
-              request.queries.append(
-                .init(
-                  name: "Name\(number)",
-                  value: "Value\(number)"
-                ))
-            }
-          }
-        } else {
-          Button("Add Query") {
-            let number = generateNewQueryNameNumber(prefix: "Name")
-            request.queries.append(
-              .init(
-                name: "Name\(number)",
-                value: "Value\(number)"
-              ))
-          }
+        Button {
+          let number = generateNewQueryNameNumber(prefix: "Name")
+          request.queries.append(.init(item: .init(key: "Name\(number)", value: "Value\(number)")))
+        } label: {
+          Label("Add Query", systemImage: "plus")
         }
-
-        LabeledContent("Result URL", value: request.url?.absoluteString ?? "Invalid URL")
       }
 
       Section("Headers") {
-        ForEach($request.headerFields) { headerField in
-          HStack {
-            LabeledContent("Name", value: headerField.wrappedValue.name.rawName)
-            Divider()
-            TextField("Value", text: headerField.value)
-            Button("X", role: .destructive) {
-              request.headerFields[headerField.wrappedValue.name] = nil
+        Table($request.headerFields) {
+          TableColumn("Name") { headerField in
+            TextField("Name", text: headerField.item.key)
+              .labelsHidden()
+          }
+          
+          TableColumn("Value") { headerField in
+            TextField("Value", text: headerField.item.value)
+              .labelsHidden()
+          }
+          
+          TableColumn("Actions") { headerField in
+            Button {
+              request.headerFields.removeAll { $0.id == headerField.id }
+            } label: {
+              Label("Delete", systemImage: "trash")
             }
           }
         }
 
-        if request.headerFields.isEmpty {
-          LabeledContent("No Headers") {
-            Menu("Add Header", systemImage: "list.dash") {
-              ForEach(NewHeader.allCases, id: \.self) { header in
-                Button(header.rawValue) {
-                  addNewHeader(header: header)
-                }
-              }
-            }
-          }
-        } else {
-          Menu("Add Header", systemImage: "list.dash") {
-            ForEach(NewHeader.allCases, id: \.self) { header in
-              Button(header.rawValue) {
-                addNewHeader(header: header)
-              }
+        Menu("Add Header", systemImage: "plus") {
+          ForEach(NewHeader.allCases) { header in
+            Button(header.rawValue) {
+              addNewHeader(header: header)
             }
           }
         }
       }
-
-      Button("Execute") {
+      Section {
+        TextField("Body (UTF-8)", text: $bodyString, axis: .vertical)
+          .disabled(useBody == false)
+      } header: {
+        Toggle("Body", isOn: $useBody)
+      }
+      Button {
         Task { await execute() }
+      } label: {
+        Label("Execute", systemImage: "play.fill")
       }
 
       Section("Information") {
@@ -156,23 +168,8 @@ struct RequestDetailView: View {
         }
       }
     }
-    .alert("Add New Header", isPresented: $isPresentedNewHeaderAlert, presenting: newHeaderField) { headerField in
-      TextField("Name", text: .init(
-        get: { self.newHeaderField?.name.rawName ?? headerField.name.rawName },
-        set: { newValue in
-          guard let name = HTTPField.Name(newValue) else { return }
-          self.newHeaderField?.name = name
-        }
-      ))
-      TextField("Value", text: .init(get: { self.newHeaderField?.value ?? headerField.value }, set: { self.newHeaderField?.value = $0 }))
-      Button("OK") {
-        request.headerFields[newHeaderField?.name ?? headerField.name] = newHeaderField?.value ?? headerField.value
-        newHeaderField = nil
-      }
-      Button("Cancel", role: .cancel) { newHeaderField = nil }
-    }
     .formStyle(.grouped)
-    .navigationTitle("Request \(request.name)")
+    .navigationTitle("[\(request.method.rawValue)] \(request.name)")
   }
 }
 

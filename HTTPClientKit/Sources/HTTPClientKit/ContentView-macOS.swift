@@ -18,15 +18,19 @@ public struct ContentView: View {
           FoldersView(parentFolder: rootFolder)
         }
         .contextMenu {
-          Button("Add Folder") {
+          Button {
             let newFolder = Folder(name: "NewFolder1")
             modelContext.insert(newFolder)
             rootFolder.childrenIds.append(newFolder.id)
+          } label: {
+            Label("Add Folder", systemImage: "folder.badge.plus")
           }
-          Button("Add File") {
+          Button {
             let newFile = File(request: .init(name: "NewRequest1", baseUrl: "https://apple.com"))
             modelContext.insert(newFile)
             rootFolder.childrenIds.append(newFile.id)
+          } label: {
+            Label("Add File", systemImage: "doc.badge.plus")
           }
         }
       } else {
