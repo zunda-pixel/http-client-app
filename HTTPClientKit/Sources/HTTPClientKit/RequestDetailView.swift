@@ -1,6 +1,8 @@
 import HTTPTypes
 import SwiftUI
+import Algorithms
 
+#if os(macOS)
 struct RequestDetailView: View {
   @Environment(ResultState.self) var resultState
   @Binding var request: Request
@@ -21,12 +23,6 @@ struct RequestDetailView: View {
       return generateNewQueryNameNumber(prefix: prefix, number: number + 1)
     }
     return number
-  }
-
-  enum NewHeader: String, CaseIterable {
-    case new = "New"
-    case authorization = "Authorization"
-    case contentType = "Content-Type"
   }
 
   func addNewHeader(header: NewHeader) {
@@ -180,6 +176,213 @@ struct RequestDetailView: View {
   }
 }
 
+#Preview {
+  @Previewable @State var request = Request(name: "Test", baseUrl: "https://api.github.com/users")
+  RequestDetailView(request: $request)
+    .environment(ResultState())
+}
+
+#else
+
+struct RequestDetailView: View {
+  @Environment(NavigationRouter.self) var router
+  @Binding var request: Request
+  @State var bodyString = ""
+  @State var useBody = false
+  
+  func addNewHeader(header: NewHeader) {
+    switch header {
+    case .new:
+      request.headerFields.append(.init(item: .init(key: "", value: "")))
+    case .authorization:
+      request.headerFields.append(.init(item: .init(key: HTTPField.Name.authorization.rawName, value: "")))
+    case .contentType:
+      request.headerFields.append(.init(item: .init(key: HTTPField.Name.contentType.rawName, value: "")))
+    }
+  }
+
+  func execute() async {
+    guard let httpRequest = request.httpRequest else { return }
+    let startDate = Date.now
+
+    do {
+      let (data, response) = if useBody {
+        try await URLSession.shared.upload(for: httpRequest, from: Data(bodyString.utf8))
+      } else {
+        try await URLSession.shared.data(for: httpRequest)
+      }
+      let result = HTTPResult(
+        startTime: startDate,
+        endTime: .now,
+        result: .success((data, response))
+      )
+      router.routes.append(.requestResult(result))
+    } catch {
+      let result = HTTPResult(
+        startTime: startDate,
+        endTime: .now,
+        result: .failure(error)
+      )
+      router.routes.append(.requestResult(result))
+    }
+  }
+  
+  func generateNewQueryNameNumber(prefix: String, number: Int = 1) -> Int {
+    let newName = "\(prefix)\(number)"
+    if request.queries.map(\.item).map(\.key).contains(newName) {
+      return generateNewQueryNameNumber(prefix: prefix, number: number + 1)
+    }
+    return number
+  }
+
+  var body: some View {
+    Form {
+      LabeledContent {
+        TextField("Name", text: $request.name)
+      } label: {
+        Text("Name")
+      }
+
+      Picker(selection: $request.method) {
+        ForEach(HTTPRequest.Method.allCases) { method in
+          Text(method.rawValue)
+            .bold()
+            .foregroundStyle(method.color)
+        }
+      } label: {
+        Text("HTTP Method")
+      }
+
+      Section("URL") {
+        Text(request.url?.absoluteString ?? "Invalid URL")
+          .bold()
+          .foregroundStyle(.secondary)
+        
+        TextField("Base URL", text: $request.baseUrl)
+      }
+      Section {
+        ForEach($request.paths) { pathItem in
+          TextField("path/to/item", text: pathItem.item)
+            .swipeActions {
+              Button(role: .destructive) {
+                request.paths.removeAll(where: { $0.id == pathItem.id })
+              } label: {
+                Label("Delete", systemImage: "trash")
+              }
+            }
+        }
+        
+        Button {
+          request.paths.append(.init(item: ""))
+        } label: {
+          Label("Add Path", systemImage: "plus")
+        }
+      } header: {
+        Text("Paths (\(request.paths.count))")
+      }
+      Section {
+        ForEach($request.queries) { queryItem in
+          HStack {
+            TextField("Name", text: queryItem.item.key)
+            Divider()
+            TextField("Value", text: queryItem.item.value)
+          }
+          .swipeActions {
+            Button(role: .destructive) {
+              request.queries.removeAll(where: { $0.id == queryItem.wrappedValue.id })
+            } label: {
+              Label("Delete", systemImage: "trash")
+            }
+          }
+        }
+        
+        Button {
+          let number = generateNewQueryNameNumber(prefix: "Name")
+          request.queries.append(
+            .init(item: .init(
+              key: "Name\(number)",
+              value: "Value\(number)"
+            ))
+          )
+        } label: {
+          Label("Add Query", systemImage: "plus")
+        }
+      } header: {
+        Text("Queries (\(request.queries.count))")
+      }
+        
+      Section {
+        ForEach($request.headerFields) { headerField in
+          HStack {
+            TextField("Name", text: headerField.item.key)
+            Divider()
+            TextField("Value", text: headerField.item.value)
+          }
+          .swipeActions {
+            Button(role: .destructive) {
+              request.headerFields.removeAll(where: { $0.id == headerField.id })
+            } label: {
+              Label("Delete", systemImage: "trash")
+            }
+          }
+        }
+        
+        Menu("Add Header", systemImage: "plus") {
+          ForEach(NewHeader.allCases) { header in
+            Button(header.rawValue) {
+              addNewHeader(header: header)
+            }
+          }
+        }
+      } header: {
+        Text("Headers (\(request.headerFields.count))")
+      }
+      Section {
+        TextField("Body (UTF-8)", text: $bodyString, axis: .vertical)
+          .disabled(useBody == false)
+      } header: {
+        Toggle("Body", isOn: $useBody)
+      }
+
+      Button {
+        Task { await execute() }
+      } label: {
+        Label("Execute", systemImage: "play.fill")
+          .bold()
+      }
+
+      Section("Information") {
+        LabeledContent("CreatedAt") {
+          Text(request.createdAt, style: .date)
+        }
+      }
+    }
+    .navigationTitle(request.name)
+  }
+}
+
+
+#Preview {
+  @Previewable @State var request = Request(name: "Test", baseUrl: "https://api.github.com/users")
+  @Previewable @State var router = NavigationRouter()
+  NavigationStack(path: $router.routes) {
+    RequestDetailView(request: $request)
+  }
+  .environment(router)
+}
+
+#endif
+
+
+
+enum NewHeader: String, CaseIterable, Identifiable {
+  var id: Self { self }
+  
+  case new = "New"
+  case authorization = "Authorization"
+  case contentType = "Content-Type"
+}
+
 extension HTTPField: @retroactive Identifiable {
   public var id: String { name.rawName + value }
 }
@@ -197,10 +400,4 @@ extension HTTPRequest.Method: @retroactive CaseIterable, @retroactive Identifiab
     .trace,
     .connect,
   ]
-}
-
-#Preview {
-  @Previewable @State var request = Request(name: "Test", baseUrl: "https://api.github.com/users")
-  RequestDetailView(request: $request)
-    .environment(ResultState())
 }

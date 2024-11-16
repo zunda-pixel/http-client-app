@@ -1,6 +1,7 @@
 import SwiftUI
 import SwiftData
 
+#if os(macOS)
 public struct ContentView: View {
   @State var resultState: ResultState = .init()
   @State var selectedItemId: UUID?
@@ -73,3 +74,5 @@ struct ItemDetailView: View {
     }
   }
 }
+#endif
+

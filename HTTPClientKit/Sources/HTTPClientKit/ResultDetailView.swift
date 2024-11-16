@@ -46,6 +46,7 @@ struct ResultDetailView: View {
       }
     }
     .formStyle(.grouped)
+    .navigationTitle("Result")
   }
 }
 
@@ -110,7 +111,18 @@ extension ResultDetailView {
 
 extension String.Encoding {
   static var allCases: [String.Encoding]  { [.utf8, .shiftJIS, .ascii, .isoLatin1, .nonLossyASCII, .utf16, .utf32] }
-  var label: String { String.localizedName(of: self) }
+  var label: String {
+    switch self {
+    case .utf8: return "UTF-8"
+    case .shiftJIS: return "Shift JIS"
+    case .ascii: return "ASCII"
+    case .isoLatin1: return "ISO Latin 1"
+    case .nonLossyASCII: return "Non-lossy ASCII"
+    case .utf16: return "UTF-16"
+    case .utf32: return "UTF-32"
+    default: return "Unknown"
+    }
+  }
 }
 
 #Preview("Success") {

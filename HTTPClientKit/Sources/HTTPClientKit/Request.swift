@@ -10,26 +10,42 @@ struct Request: Sendable, Hashable, Identifiable, Codable {
   var updatedAt: Date = .now
   var method: HTTPRequest.Method = .get
   var baseUrl: String
-  var queries: [URLQueryItem] = []
+  var paths: [IdentifiedItem<String>] = []
+  var queries: [IdentifiedItem<KeyValue<String, String>>] = []
 
   var url: URL? {
-    if queries.isEmpty {
+    let queries = queries.map(\.item).map { URLQueryItem(name: $0.key, value: $0.value) }
+    
+    let url = if queries.isEmpty {
       URL(string: baseUrl)
     } else {
       URL(string: baseUrl)?.appending(queryItems: queries)
     }
+    
+    guard var url else { return nil }
+    
+    for path in paths {
+      url.append(path: path.item)
+    }
+    
+    return url
   }
 
   var httpRequest: HTTPRequest? {
     guard let url else { return nil }
-
+    
+    let headerFields: HTTPFields = headerFields.map(\.item).reduce(into: [:]) { items, item in
+      guard let key = HTTPField.Name(item.key) else { return }
+      items[key] = item.value
+    }
+    
     return HTTPRequest(
       method: method,
       url: url,
       headerFields: headerFields
     )
   }
-  var headerFields: HTTPFields = [:]
+  var headerFields: [IdentifiedItem<KeyValue<String, String>>] = []
   var body: Data? = nil
 }
 
