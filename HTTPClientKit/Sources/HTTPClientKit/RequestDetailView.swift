@@ -73,12 +73,12 @@ struct RequestDetailView: View {
       }
       
       Section("Paths") {
-        ForEach($request.paths.indexed(), id: \.element.id) { i,  pathItem in
-          TextField("Path\(i)", text: pathItem.item)
+        ForEach($request.paths.indexed(), id: \.element.id) { i, path in
+          TextField("Path\(i)", text: path.item)
             .contentShape(.rect)
             .contextMenu {
               Button {
-                request.paths.removeAll { $0.id == pathItem.id }
+                request.paths.removeAll { $0.id == path.id }
               } label: {
                 Label("Delete", systemImage: "trash")
               }
@@ -94,19 +94,19 @@ struct RequestDetailView: View {
       
       Section("Queries") {
         Table($request.queries) {
-          TableColumn("Name") { queryItem in
-            TextField("Name", text: queryItem.item.key)
+          TableColumn("Name") { query in
+            TextField("Name", text: query.item.key)
               .labelsHidden()
           }
           
-          TableColumn("Value") { queryItem in
-            TextField("Value", text: queryItem.item.value)
+          TableColumn("Value") { query in
+            TextField("Value", text: query.item.value)
               .labelsHidden()
           }
           
-          TableColumn("Actions") { queryItem in
+          TableColumn("Actions") { query in
             Button {
-              request.queries.removeAll { $0.id == queryItem.id }
+              request.queries.removeAll { $0.id == query.id }
             } label: {
               Label("Delete", systemImage: "trash")
             }
