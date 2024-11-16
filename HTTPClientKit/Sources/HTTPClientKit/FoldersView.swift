@@ -9,6 +9,9 @@ struct FoldersView: View {
     ForEach(parentFolder.childrenIds, id: \.self) { childId in
       ItemView(parentFolder: parentFolder, itemId: childId)
     }
+    .onMove { source, destination in
+      parentFolder.childrenIds.move(fromOffsets: source, toOffset: destination)
+    }
   }
 }
 
