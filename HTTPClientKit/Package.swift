@@ -30,7 +30,7 @@ let package = Package(
         .product(name: "OrderedCollections", package: "swift-collections"),
       ],
       plugins: [
-        .plugin(name: "LicenseProviderPlugin", package: "LicenseProvider"),
+        .plugin(name: "LicenseProviderPlugin", package: "LicenseProvider")
       ]
     ),
     .testTarget(

@@ -9,12 +9,12 @@ struct LicensesView: View {
             Text(package.license)
               .padding()
           }
-            .toolbar {
-              if package.kind == .remoteSourceControl {
-                ShareLink(item: package.location)
-              }
+          .toolbar {
+            if package.kind == .remoteSourceControl {
+              ShareLink(item: package.location)
             }
-            .navigationTitle(package.name)
+          }
+          .navigationTitle(package.name)
         }
       }
     }

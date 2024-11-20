@@ -6,16 +6,19 @@ struct BodyEditor: View {
   @Binding var bodyData: Data?
   @Binding var encoding: BodyEncoding
   @State var isPresentedAlert: Bool = false
-  
+
   init(
     bodyData: Binding<Data?>,
     encoding: Binding<BodyEncoding>
   ) {
     self._bodyData = bodyData
     self._encoding = encoding
-    self.bodyString = bodyData.wrappedValue.map { String(data: $0, encoding: encoding.wrappedValue.rawEncoding) ?? "" } ?? ""
+    self.bodyString =
+      bodyData.wrappedValue.map {
+        String(data: $0, encoding: encoding.wrappedValue.rawEncoding) ?? ""
+      } ?? ""
   }
-  
+
   var body: some View {
     NavigationStack {
       List {

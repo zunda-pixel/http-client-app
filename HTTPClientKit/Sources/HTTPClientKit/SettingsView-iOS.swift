@@ -1,27 +1,27 @@
 import SwiftUI
 
 #if !os(macOS)
-struct SettingsView: View {
-  var body: some View {
-    NavigationStack {
-      List {
-        Section("Environments") {
-          NavigationLink("Manage Environments") {
-            EnvironmentsView()
+  struct SettingsView: View {
+    var body: some View {
+      NavigationStack {
+        List {
+          Section("Environments") {
+            NavigationLink("Manage Environments") {
+              EnvironmentsView()
+            }
+          }
+          Section("General") {
+            NavigationLink("Licenses") {
+              LicensesView()
+            }
           }
         }
-        Section("General") {
-          NavigationLink("Licenses") {
-            LicensesView()
-          }
-        }
+        .navigationTitle("Settings")
       }
-      .navigationTitle("Settings")
     }
   }
-}
 
-#Preview {
-  SettingsView()
-}
+  #Preview {
+    SettingsView()
+  }
 #endif

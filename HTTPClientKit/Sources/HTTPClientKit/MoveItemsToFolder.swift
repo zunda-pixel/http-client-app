@@ -1,5 +1,5 @@
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 struct MoveItemsToFolder: View {
   @Query var folders: [Folder]
@@ -8,15 +8,15 @@ struct MoveItemsToFolder: View {
   var ids: Set<UUID>
   @Environment(\.dismiss) var dismiss
   @Environment(\.modelContext) var modelContext
-  
+
   func moveItems(folder: Folder) {
     var copiedIds = ids
-    
+
     // if Move Folder, remove childrenIds from target ids
     for folder in folders where ids.contains(folder.id) {
       folder.childrenIds.forEach { copiedIds.remove($0) }
     }
-    
+
     // if Move File, remove id from original folder childrenIds
     for id in ids {
       if let folder = folders.first(where: { $0.childrenIds.contains(id) }) {
@@ -28,7 +28,7 @@ struct MoveItemsToFolder: View {
 
     dismiss()
   }
-  
+
   var body: some View {
     NavigationStack {
       List(selection: $selectedFolderId) {
@@ -51,7 +51,7 @@ struct MoveItemsToFolder: View {
     }
     .environment(\.editMode, .constant(.active))
   }
-  
+
   @ViewBuilder
   func foldersView(childrenIds: [UUID]) -> some View {
     ForEach(childrenIds.filter { !ids.contains($0) }, id: \.self) { id in

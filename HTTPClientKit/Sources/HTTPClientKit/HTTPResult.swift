@@ -5,7 +5,7 @@ struct HTTPResult: Hashable {
   var startTime: Date
   var endTime: Date
   var result: Result<(data: Data, response: HTTPResponse), any Error>
-  
+
   static func == (lhs: HTTPResult, rhs: HTTPResult) -> Bool {
     switch lhs.result {
     case .success(let successLhs):
@@ -24,8 +24,7 @@ struct HTTPResult: Hashable {
       }
     }
   }
-  
-  
+
   func hash(into hasher: inout Hasher) {
     hasher.combine(startTime)
     hasher.combine(endTime)

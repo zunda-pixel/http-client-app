@@ -3,7 +3,7 @@ import Foundation
 struct IdentifiedItem<Item>: Identifiable {
   var id: UUID
   var item: Item
-  
+
   init(id: UUID = UUID(), item: Item) {
     self.id = id
     self.item = item

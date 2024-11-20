@@ -4,14 +4,14 @@ import SwiftUI
 struct ResultDetailView: View {
   let result: HTTPResult
   @State private var isPresentedDuration = false
-  
+
   var navigationTitle: String {
     switch result.result {
     case .success(_): "Result"
     case .failure(_): "Failure Result"
     }
   }
-  
+
   var body: some View {
     Form {
       Section("Information") {
@@ -49,7 +49,7 @@ struct ResultDetailView: View {
           let duration: String = {
             let formatter = MeasurementFormatter()
             formatter.unitOptions = [
-              .providedUnit,
+              .providedUnit
             ]
             return formatter.string(from: .init(value: duration, unit: UnitDuration.seconds))
           }()
@@ -87,7 +87,8 @@ extension ResultDetailView {
           Text("No headers")
         } else {
           DisclosureGroup("Headers", isExpanded: $isExpanded) {
-            ForEach(response.headerFields.sorted(using: KeyPathComparator(\.name.rawName))) { header in
+            ForEach(response.headerFields.sorted(using: KeyPathComparator(\.name.rawName))) {
+              header in
               HStack {
                 Text(header.name.rawName)
                   .bold()
@@ -102,7 +103,7 @@ extension ResultDetailView {
           }
         }
       }
-      
+
       Section {
         if let string = String(data: data, encoding: encoding.rawEncoding) {
           Picker("Encoding", selection: $encoding) {
@@ -123,10 +124,10 @@ extension ResultDetailView {
           Button {
             guard let string = String(data: data, encoding: encoding.rawEncoding) else { return }
             #if canImport(UIKit)
-            UIPasteboard.general.string = string
+              UIPasteboard.general.string = string
             #elseif canImport(AppKit)
-            NSPasteboard.general.clearContents()
-            NSPasteboard.general.setString(string, forType: .string)
+              NSPasteboard.general.clearContents()
+              NSPasteboard.general.setString(string, forType: .string)
             #endif
           } label: {
             Label("Copy", systemImage: "doc.on.doc")
@@ -150,27 +151,33 @@ extension ResultDetailView {
 
 #Preview("Success") {
   NavigationStack {
-    ResultDetailView(result: .init(
-      startTime: .now,
-      endTime: .now.addingTimeInterval(123.456789123456789),
-      result: .success((Data("""
-{
-  "id": 1,
-  "name": "Hello, World!",
-  "age": 34,
-  "biirthdayAt": \(Date.now.timeIntervalSinceReferenceDate)
-}
-""".utf8), .init(status: .ok, headerFields: [.accept: "application/json"])))
-    ))
+    ResultDetailView(
+      result: .init(
+        startTime: .now,
+        endTime: .now.addingTimeInterval(123.456789123456789),
+        result: .success(
+          (
+            Data(
+              """
+              {
+                "id": 1,
+                "name": "Hello, World!",
+                "age": 34,
+                "biirthdayAt": \(Date.now.timeIntervalSinceReferenceDate)
+              }
+              """.utf8), .init(status: .ok, headerFields: [.accept: "application/json"])
+          ))
+      ))
   }
 }
 
 #Preview("Failure") {
   NavigationStack {
-    ResultDetailView(result: .init(
-      startTime: .now,
-      endTime: .now.addingTimeInterval(123.456),
-      result: .failure(NSError(domain: "Failed something", code: 1))
-    ))
+    ResultDetailView(
+      result: .init(
+        startTime: .now,
+        endTime: .now.addingTimeInterval(123.456),
+        result: .failure(NSError(domain: "Failed something", code: 1))
+      ))
   }
 }

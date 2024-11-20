@@ -15,30 +15,31 @@ struct Request: Sendable, Hashable, Identifiable, Codable {
 
   var url: URL? {
     let queries = queries.map(\.item).map { URLQueryItem(name: $0.key, value: $0.value) }
-    
-    let url = if queries.isEmpty {
-      URL(string: baseUrl)
-    } else {
-      URL(string: baseUrl)?.appending(queryItems: queries)
-    }
-    
+
+    let url =
+      if queries.isEmpty {
+        URL(string: baseUrl)
+      } else {
+        URL(string: baseUrl)?.appending(queryItems: queries)
+      }
+
     guard var url else { return nil }
-    
+
     for path in paths {
       url.append(path: path.item)
     }
-    
+
     return url
   }
 
   var httpRequest: HTTPRequest? {
     guard let url else { return nil }
-    
+
     let headerFields: HTTPFields = headerFields.map(\.item).reduce(into: [:]) { items, item in
       guard let key = HTTPField.Name(item.key) else { return }
       items[key] = item.value
     }
-    
+
     return HTTPRequest(
       method: method,
       url: url,
@@ -58,10 +59,11 @@ extension HTTPRequest.Method: Codable {
     if let method = Self(rawValue: rawValue) {
       self = method
     } else {
-      throw DecodingError.dataCorrupted(.init(codingPath: container.codingPath, debugDescription: "Invalid method: \(rawValue)"))
+      throw DecodingError.dataCorrupted(
+        .init(codingPath: container.codingPath, debugDescription: "Invalid method: \(rawValue)"))
     }
   }
-  
+
   public func encode(to encoder: any Encoder) throws {
     var container = encoder.singleValueContainer()
     try container.encode(rawValue)
@@ -73,7 +75,7 @@ extension URLQueryItem: Codable {
     case name
     case value
   }
-  
+
   public init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: CodingKeys.self)
     let name = try container.decode(String.self, forKey: .name)
