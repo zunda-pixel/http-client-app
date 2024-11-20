@@ -1,6 +1,8 @@
 import SwiftData
 import SwiftUI
 
+#if !os(macOS)
+
 struct MoveItemsToFolder: View {
   @Query var folders: [Folder]
   @State var selectedFolderId: Folder.ID?
@@ -65,3 +67,4 @@ struct MoveItemsToFolder: View {
     }
   }
 }
+#endif
