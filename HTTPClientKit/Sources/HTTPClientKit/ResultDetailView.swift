@@ -55,7 +55,7 @@ extension ResultDetailView {
     let data: Data
     let response: HTTPResponse
     @State var isExpanded = false
-    @State var stringEncoding: String.Encoding = .utf8
+    @State var encoding: BodyEncoding = .utf8
 
     var body: some View {
       LabeledContent("Status Code", value: response.status.code.description)
@@ -90,9 +90,9 @@ extension ResultDetailView {
         HStack {
           Text("Data")
           Divider()
-          Picker("Encoding", selection: $stringEncoding) {
-            ForEach(String.Encoding.allCases, id: \.label) { encoding in
-              Text(encoding.label)
+          Picker("Encoding", selection: $encoding) {
+            ForEach(BodyEncoding.allCases, id: \.self) { encoding in
+              Text(encoding.rawValue)
                 .tag(encoding)
             }
           }
@@ -105,22 +105,6 @@ extension ResultDetailView {
     var error: any Error
     var body: some View {
       Text(error.localizedDescription)
-    }
-  }
-}
-
-extension String.Encoding {
-  static var allCases: [String.Encoding]  { [.utf8, .shiftJIS, .ascii, .isoLatin1, .nonLossyASCII, .utf16, .utf32] }
-  var label: String {
-    switch self {
-    case .utf8: return "UTF-8"
-    case .shiftJIS: return "Shift JIS"
-    case .ascii: return "ASCII"
-    case .isoLatin1: return "ISO Latin 1"
-    case .nonLossyASCII: return "Non-lossy ASCII"
-    case .utf16: return "UTF-16"
-    case .utf32: return "UTF-32"
-    default: return "Unknown"
     }
   }
 }

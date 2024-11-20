@@ -184,8 +184,7 @@ struct RequestDetailView: View {
 struct RequestDetailView: View {
   @Environment(NavigationRouter.self) var router
   @Binding var request: Request
-  @State var bodyString = ""
-  @State var useBody = false
+  @State var isPresentedBodyEditor = false
   
   func addNewHeader(header: NewHeader) {
     switch header {
@@ -203,8 +202,8 @@ struct RequestDetailView: View {
     let startDate = Date.now
 
     do {
-      let (data, response) = if useBody {
-        try await URLSession.shared.upload(for: httpRequest, from: Data(bodyString.utf8))
+      let (data, response) = if request.useBody, let body = request.body {
+        try await URLSession.shared.upload(for: httpRequest, from: body)
       } else {
         try await URLSession.shared.data(for: httpRequest)
       }
@@ -335,17 +334,35 @@ struct RequestDetailView: View {
         Text("Headers (\(request.headerFields.count))")
       }
       Section {
-        TextField("Body (UTF-8)", text: $bodyString, axis: .vertical)
-          .disabled(useBody == false)
+        Button {
+          isPresentedBodyEditor.toggle()
+        } label: {
+          let formatter: MeasurementFormatter = {
+            let formatter = MeasurementFormatter()
+            formatter.unitOptions = [.naturalScale]
+            formatter.numberFormatter.maximumFractionDigits = 2
+            return formatter
+          }()
+          let bytes = formatter.string(from: .init(
+            value: Double(request.body?.count ?? 0),
+            unit: UnitInformationStorage.bytes
+          ))
+          Label("Edit Body \(bytes)", systemImage: "doc.on.doc")
+        }
+        .sheet(isPresented: $isPresentedBodyEditor) {
+          BodyEditor(
+            bodyData: .init(
+              get: { request.body },
+              set: { request.body = $0 }
+            ),
+            encoding: .init(
+              get: { request.encoding },
+              set: { request.encoding = $0 }
+            )
+          )
+        }
       } header: {
-        Toggle("Body", isOn: $useBody)
-      }
-
-      Button {
-        Task { await execute() }
-      } label: {
-        Label("Execute", systemImage: "play.fill")
-          .bold()
+        Toggle("Body", isOn: .init(get: { request.useBody }, set: { request.useBody = $0 }))
       }
 
       Section("Information") {
@@ -356,6 +373,14 @@ struct RequestDetailView: View {
     }
     .navigationTitle("[\(request.method.rawValue)] \(request.name)")
     .navigationBarTitleDisplayMode(.inline)
+    .toolbar {
+      Button {
+        Task { await execute() }
+      } label: {
+        Label("Execute", systemImage: "play.fill")
+          .bold()
+      }
+    }
   }
 }
 

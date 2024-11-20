@@ -46,7 +46,9 @@ struct Request: Sendable, Hashable, Identifiable, Codable {
     )
   }
   var headerFields: [IdentifiedItem<KeyValue<String, String>>] = []
+  var useBody = false
   var body: Data? = nil
+  var encoding: BodyEncoding = .utf8
 }
 
 extension HTTPRequest.Method: Codable {
