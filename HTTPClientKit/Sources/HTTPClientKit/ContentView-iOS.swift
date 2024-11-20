@@ -37,55 +37,62 @@ public struct ContentView: View {
           SettingsView()
         }
         .toolbar {
-          ToolbarItemGroup {
+          ToolbarItemGroup(placement: .bottomBar) {
+            if editMode == .active {
+              Button("Move") {
+                isPresentedMoveItemToFolderView.toggle()
+              }
+              .disabled(selectedItemIds.isEmpty)
+              Spacer()
+              Button("Delete") {
+                
+              }
+              .disabled(selectedItemIds.isEmpty)
+            }
+          }
+          ToolbarItemGroup(placement: .topBarTrailing) {
             if editMode == .active {
               Button("Done") {
                 editMode = .inactive
               }
-            }
-            
-            Menu {
-              Section {
-                if selectedItemIds.isEmpty == false {
-                  Button {
-                    isPresentedMoveItemToFolderView.toggle()
-                  } label: {
-                    Label("Move", systemImage: "folder")
+            } else {
+              Menu {
+                if editMode != .active {
+                  Section {
+                    Button {
+                      editMode = .active
+                    } label: {
+                      Label("Select", systemImage: "checkmark.circle")
+                    }
                   }
                 }
                 
-                Button {
-                  editMode = editMode.isEditing ? .inactive : .active
-                } label: {
-                  Label(editMode.isEditing ? "Done" : "Edit", systemImage: editMode.isEditing ? "checkmark.circle" : "pencil")
+                Section {
+                  Button {
+                    let folder = Folder(name: "NewFolder1")
+                    modelContext.insert(folder)
+                    rootFolder.childrenIds.append(folder.id)
+                  } label: {
+                    Label("Add Folder", systemImage: "folder.badge.plus")
+                  }
+                  Button {
+                    let file = File(request: .init(name: "NewRequest1", baseUrl: "https://apple.com"))
+                    modelContext.insert(file)
+                    rootFolder.childrenIds.append(file.id)
+                  } label: {
+                    Label("Add File", systemImage: "doc.badge.plus")
+                  }
                 }
+                Section {
+                  Button {
+                    isPresentedSettingsView.toggle()
+                  } label: {
+                    Label("Settings", systemImage: "gear")
+                  }
+                }
+              } label: {
+                Label("Menu", systemImage: "ellipsis.circle")
               }
-              
-              Section {
-                Button {
-                  let folder = Folder(name: "NewFolder1")
-                  modelContext.insert(folder)
-                  rootFolder.childrenIds.append(folder.id)
-                } label: {
-                  Label("Add Folder", systemImage: "folder.badge.plus")
-                }
-                Button {
-                  let file = File(request: .init(name: "NewRequest1", baseUrl: "https://apple.com"))
-                  modelContext.insert(file)
-                  rootFolder.childrenIds.append(file.id)
-                } label: {
-                  Label("Add File", systemImage: "doc.badge.plus")
-                }
-              }
-              Section {
-                Button {
-                  isPresentedSettingsView.toggle()
-                } label: {
-                  Label("Settings", systemImage: "gear")
-                }
-              }
-            } label: {
-              Label("Menu", systemImage: "ellipsis.circle")
             }
           }
         }

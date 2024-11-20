@@ -8,6 +8,7 @@ struct FoldersView: View {
   var body: some View {
     ForEach(parentFolder.childrenIds, id: \.self) { childId in
       ItemView(parentFolder: parentFolder, itemId: childId)
+        .alignmentGuide(.listRowSeparatorLeading) { $0[.leading] }
     }
     .onMove { source, destination in
       parentFolder.childrenIds.move(fromOffsets: source, toOffset: destination)
@@ -139,6 +140,8 @@ struct ItemView: View {
         }
       }
       .id(file.id)
+    } else {
+      fatalError()
     }
   }
 }
@@ -253,6 +256,8 @@ struct ItemView: View {
             Label("Duplicate", systemImage: "plus.square.on.square")
           }
         }
+    } else {
+      fatalError()
     }
   }
 }
