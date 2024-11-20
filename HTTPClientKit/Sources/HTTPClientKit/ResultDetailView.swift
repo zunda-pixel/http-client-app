@@ -75,34 +75,51 @@ extension ResultDetailView {
   struct SuccessView: View {
     let data: Data
     let response: HTTPResponse
-    @State var isExpanded = false
+    @State var isExpandedHeaders = false
     @State var encoding: BodyEncoding = .utf8
 
     var body: some View {
       LabeledContent("Status Code", value: response.status.code.description)
         .foregroundStyle(response.status == .ok ? .green : .red)
 
-      Section {
-        if response.headerFields.isEmpty {
-          Text("No headers")
-        } else {
-          DisclosureGroup("Headers", isExpanded: $isExpanded) {
-            ForEach(response.headerFields.sorted(using: KeyPathComparator(\.name.rawName))) {
-              header in
-              HStack {
-                Text(header.name.rawName)
-                  .bold()
-                Spacer()
-                Divider()
-                Spacer()
-                Text(header.value)
-                  .foregroundStyle(.secondary)
-                  .bold()
+      #if os(macOS)
+        Section("Headers", isExpanded: $isExpandedHeaders) {
+          if response.headerFields.isEmpty {
+            Text("No headers")
+          }
+          
+          Table(self.response.headerFields) {
+            TableColumn("Name") { header in
+              Text(header.name.rawName)
+            }
+            TableColumn("Value") { header in
+              Text(header.value)
+            }
+          }
+        }
+      #else
+        Section {
+          if response.headerFields.isEmpty {
+            Text("No headers")
+          } else {
+            DisclosureGroup("Headers", isExpanded: $isExpanded) {
+              ForEach(response.headerFields.sorted(using: KeyPathComparator(\.name.rawName))) {
+                header in
+                HStack {
+                  Text(header.name.rawName)
+                    .bold()
+                  Spacer()
+                  Divider()
+                  Spacer()
+                  Text(header.value)
+                    .foregroundStyle(.secondary)
+                    .bold()
+                }
               }
             }
           }
         }
-      }
+      #endif
 
       Section {
         if let string = String(data: data, encoding: encoding.rawEncoding) {

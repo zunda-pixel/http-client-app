@@ -7,8 +7,8 @@ import SwiftUI
     @Environment(ResultState.self) var resultState
     @Binding var request: Request
     @State var bodyString = ""
-    @State var useBody = false
-
+    @State var isPresentedBodyEditor = false
+    
     func generateNewHeaderName(number: Int = 1) -> String {
       let newName = "Name\(number)"
       if request.headerFields.map(\.item.key).contains(newName) {
@@ -43,14 +43,23 @@ import SwiftUI
       let startDate = Date.now
 
       do {
-        let (data, response) = try await URLSession.shared.data(for: httpRequest)
+        let (data, response) =
+          if request.useBody, let body = request.body {
+            try await URLSession.shared.upload(for: httpRequest, from: body)
+          } else {
+            try await URLSession.shared.data(for: httpRequest)
+          }
         resultState.result = .init(
           startTime: startDate,
           endTime: .now,
           result: .success((data, response))
         )
       } catch {
-        resultState.result = .init(startTime: startDate, endTime: .now, result: .failure(error))
+        resultState.result = .init(
+          startTime: startDate,
+          endTime: .now,
+          result: .failure(error)
+        )
       }
     }
 
@@ -154,15 +163,29 @@ import SwiftUI
           }
         }
         Section {
-          TextField("Body (UTF-8)", text: $bodyString, axis: .vertical)
-            .disabled(useBody == false)
+          if let body = request.body {
+            if let string = String(data: body, encoding: request.encoding.rawEncoding) {
+              Text(string)
+            } else {
+              Text("Failed to decode body")
+            }
+          } else {
+            Text("No body")
+          }
         } header: {
-          Toggle("Body", isOn: $useBody)
+          HStack {
+            Toggle("Body", isOn: .init(get: { request.useBody }, set: { request.useBody = $0 }))
+            Button("Edit") {
+              isPresentedBodyEditor.toggle()
+            }
+          }
         }
-        Button {
-          Task { await execute() }
-        } label: {
-          Label("Execute", systemImage: "play.fill")
+        .sheet(isPresented: $isPresentedBodyEditor) {
+          BodyEditor(
+            bodyData: .init(get: { request.body }, set: { request.body = $0 }),
+            encoding: .init(get: { request.encoding }, set: { request.encoding = $0 })
+          )
+          .frame(minHeight: 400)
         }
 
         Section("Information") {
@@ -173,6 +196,13 @@ import SwiftUI
       }
       .formStyle(.grouped)
       .navigationTitle("[\(request.method.rawValue)] \(request.name)")
+      .toolbar {
+        Button {
+          Task { await execute() }
+        } label: {
+          Label("Execute", systemImage: "play.fill")
+        }
+      }
     }
   }
 
