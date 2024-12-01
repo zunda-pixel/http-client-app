@@ -78,6 +78,53 @@ public final class Request: @unchecked Sendable, Hashable {
       headerFields: headerFields
     )
   }
+  
+  func generateNewHeaerName(prefix: String, postfix: Int) -> String {
+    let name = "\(prefix)\(postfix)"
+    if headerFields.contains(where: { $0.item.key == name }) {
+      return generateNewHeaerName(prefix: prefix, postfix: postfix + 1)
+    }
+    return name
+  }
+  
+  func generateNewQueryName(prefix: String, postfix: Int) -> String {
+    let name = "\(prefix)\(postfix)"
+    if queries.contains(where: { $0.item.key == name }) {
+      return generateNewQueryName(prefix: prefix, postfix: postfix + 1)
+    }
+    return name
+  }
+  
+  private func addNewHeaderField() {
+    let name = generateNewHeaerName(prefix: "NewHeader", postfix: 1)
+    headerFields.append(IdentifiedItem(item: KeyValue(key: name, value: "Value", isOn: true)))
+  }
+  
+  func addNewQuery() {
+    let name = generateNewQueryName(prefix: "NewHeader", postfix: 1)
+    queries.append(IdentifiedItem(item: KeyValue(key: name, value: "Value", isOn: true)))
+  }
+  
+  func addNewHeader(header: NewHeader) {
+    switch header {
+    case .new:
+      addNewHeaderField()
+    case .authorization:
+      headerFields.append(
+        .init(item: .init(key: HTTPField.Name.authorization.rawName, value: "", isOn: true)))
+    case .contentType:
+      headerFields.append(
+        .init(item: .init(key: HTTPField.Name.contentType.rawName, value: "", isOn: true)))
+    }
+  }
+}
+
+enum NewHeader: String, CaseIterable, Identifiable {
+  var id: Self { self }
+
+  case new = "New"
+  case authorization = "Authorization"
+  case contentType = "Content-Type"
 }
 
 extension HTTPRequest.Method: Codable {

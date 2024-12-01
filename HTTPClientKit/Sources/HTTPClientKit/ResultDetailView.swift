@@ -198,3 +198,7 @@ extension ResultDetailView {
       ))
   }
 }
+
+extension HTTPField: @retroactive Identifiable {
+  public var id: String { name.rawName + value }
+}

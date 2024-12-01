@@ -4,7 +4,7 @@ import SwiftUI
 #if os(macOS)
   public struct ContentView: View {
     @State var resultState: ResultState = .init()
-    @State var selectedRequest: Request?
+    @State var selectedItemIds: Set<UUID> = []
     @Environment(\.modelContext) var modelContext
     @Query(filter: #Predicate<Folder> { $0.name == "Root" }) var folders: [Folder]
 
@@ -13,7 +13,7 @@ import SwiftUI
     public var body: some View {
       NavigationSplitView {
         if let rootFolder = folders.first {
-          List(selection: $selectedRequest) {
+          List(selection: $selectedItemIds) {
             FoldersView(parentFolder: rootFolder)
           }
           .contextMenu {
@@ -42,8 +42,8 @@ import SwiftUI
           }
         }
       } content: {
-        if let selectedRequest {
-          RequestDetailView(request: selectedRequest)
+        if let itemId = self.selectedItemIds.first {
+          RequestDetailOrEmptyView(itemId: itemId)
         } else {
           ContentUnavailableView("No item selected", systemImage: "house")
         }

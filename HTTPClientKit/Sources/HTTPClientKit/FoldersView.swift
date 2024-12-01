@@ -18,7 +18,6 @@ struct FoldersView: View {
     }
     ForEach(parentFolder.childrenRequests) { request in
       RequestCell(parentFolder: parentFolder, request: request)
-        .id(request)
         .alignmentGuide(.listRowSeparatorLeading) { $0[.leading] }
     }
     .onMove { source, destination in

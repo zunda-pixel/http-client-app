@@ -1,43 +1,29 @@
 import Algorithms
 import HTTPTypes
 import SwiftUI
+import SwiftData
 
 #if os(macOS)
+  struct RequestDetailOrEmptyView: View {
+    @Query var request: [Request]
+    
+    init(itemId: UUID) {
+      _request = .init(filter: #Predicate<Request> { $0.id == itemId })
+    }
+    
+    var body: some View {
+      if let request = request.first {
+        RequestDetailView(request: request)
+      }
+    }
+  }
+
   struct RequestDetailView: View {
     @Environment(ResultState.self) var resultState
     var request: Request
     @State var bodyString = ""
     @State var isPresentedBodyEditor = false
     
-    func generateNewHeaderName(number: Int = 1) -> String {
-      let newName = "Name\(number)"
-      if request.headerFields.map(\.item.key).contains(newName) {
-        return generateNewHeaderName(number: number + 1)
-      }
-      return newName
-    }
-
-    func generateNewQueryNameNumber(prefix: String, number: Int = 1) -> Int {
-      let newName = "\(prefix)\(number)"
-      if request.queries.map(\.item).map(\.key).contains(newName) {
-        return generateNewQueryNameNumber(prefix: prefix, number: number + 1)
-      }
-      return number
-    }
-
-    func addNewHeader(header: NewHeader) {
-      switch header {
-      case .new:
-        request.headerFields.append(.init(item: .init(key: "", value: "", isOn: true)))
-      case .authorization:
-        request.headerFields.append(
-          .init(item: .init(key: HTTPField.Name.authorization.rawName, value: "", isOn: true)))
-      case .contentType:
-        request.headerFields.append(
-          .init(item: .init(key: HTTPField.Name.contentType.rawName, value: "", isOn: true)))
-      }
-    }
-
     func execute() async {
       guard let httpRequest = request.httpRequest else { return }
       let startDate = Date.now
@@ -134,9 +120,7 @@ import SwiftUI
           }
 
           Button {
-            let number = generateNewQueryNameNumber(prefix: "Name")
-            request.queries.append(
-              .init(item: .init(key: "Name\(number)", value: "Value\(number)", isOn: true)))
+            request.addNewQuery()
           } label: {
             Label("Add Query", systemImage: "plus")
           }
@@ -171,7 +155,7 @@ import SwiftUI
           Menu("Add Header", systemImage: "plus") {
             ForEach(NewHeader.allCases) { header in
               Button(header.rawValue) {
-                addNewHeader(header: header)
+                request.addNewHeader(header: header)
               }
             }
           }
@@ -233,19 +217,6 @@ import SwiftUI
     var request: Request
     @State var isPresentedBodyEditor = false
 
-    func addNewHeader(header: NewHeader) {
-      switch header {
-      case .new:
-        request.headerFields.append(.init(item: .init(key: "", value: "", isOn: true)))
-      case .authorization:
-        request.headerFields.append(
-          .init(item: .init(key: HTTPField.Name.authorization.rawName, value: "", isOn: true)))
-      case .contentType:
-        request.headerFields.append(
-          .init(item: .init(key: HTTPField.Name.contentType.rawName, value: "", isOn: true)))
-      }
-    }
-
     func execute() async {
       guard let httpRequest = request.httpRequest else { return }
       let startDate = Date.now
@@ -271,14 +242,6 @@ import SwiftUI
         )
         router.routes.append(.requestResult(result))
       }
-    }
-
-    func generateNewQueryNameNumber(prefix: String, number: Int = 1) -> Int {
-      let newName = "\(prefix)\(number)"
-      if request.queries.map(\.item).map(\.key).contains(newName) {
-        return generateNewQueryNameNumber(prefix: prefix, number: number + 1)
-      }
-      return number
     }
 
     var body: some View {
@@ -353,15 +316,7 @@ import SwiftUI
           }
 
           Button {
-            let number = generateNewQueryNameNumber(prefix: "Name")
-            request.queries.append(
-              .init(
-                item: .init(
-                  key: "Name\(number)",
-                  value: "Value\(number)",
-                  isOn: true
-                ))
-            )
+            request.addNewQuery()
           } label: {
             Label("Add Query", systemImage: "plus")
           }
@@ -391,7 +346,7 @@ import SwiftUI
           Menu("Add Header", systemImage: "plus") {
             ForEach(NewHeader.allCases) { header in
               Button(header.rawValue) {
-                addNewHeader(header: header)
+                request.addNewHeader(header: header)
               }
             }
           }
@@ -454,18 +409,6 @@ import SwiftUI
   }
 
 #endif
-
-enum NewHeader: String, CaseIterable, Identifiable {
-  var id: Self { self }
-
-  case new = "New"
-  case authorization = "Authorization"
-  case contentType = "Content-Type"
-}
-
-extension HTTPField: @retroactive Identifiable {
-  public var id: String { name.rawName + value }
-}
 
 extension HTTPRequest.Method: @retroactive CaseIterable, @retroactive Identifiable {
   public var id: Self { self }

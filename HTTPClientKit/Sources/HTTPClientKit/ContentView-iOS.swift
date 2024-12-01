@@ -9,13 +9,14 @@ import SwiftUI
     @State var router = NavigationRouter()
     @State var isPresentedSettingsView: Bool = false
     @State var editMode: EditMode = .inactive
-
+    @State var selectedItemIds: Set<UUID> = []
+    
     public init() {}
 
     public var body: some View {
       NavigationStack(path: $router.routes) {
         if let rootFolder = folders.first {
-          List {
+          List(selection: $selectedItemIds) {
             FoldersView(parentFolder: rootFolder)
           }
           .environment(\.editMode, $editMode)
