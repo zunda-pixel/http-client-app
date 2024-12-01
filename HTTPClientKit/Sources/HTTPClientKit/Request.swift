@@ -1,18 +1,49 @@
 import Foundation
 import HTTPTypes
 import HTTPTypesFoundation
+import Observation
+import SwiftData
 
-struct Request: Sendable, Hashable, Identifiable, Codable {
-  typealias ID = UUID
-  var id: ID = .init()
+@Model
+public final class Request: @unchecked Sendable, Hashable {
   var name: String
-  var createdAt: Date = .now
-  var updatedAt: Date = .now
-  var method: HTTPRequest.Method = .get
+  var createdAt: Date
+  var updatedAt: Date
+  var method: HTTPRequest.Method
   var baseUrl: String
-  var paths: [IdentifiedItem<URLPath>] = []
-  var queries: [IdentifiedItem<KeyValue<String, String>>] = []
-
+  var paths: [IdentifiedItem<URLPath>]
+  var queries: [IdentifiedItem<KeyValue<String, String>>]
+  var headerFields: [IdentifiedItem<KeyValue<String, String>>]
+  var useBody: Bool
+  var body: Data?
+  var encoding: BodyEncoding
+  
+  init(
+    name: String,
+    createdAt: Date = .now,
+    updatedAt: Date = .now,
+    method: HTTPRequest.Method = .get,
+    baseUrl: String,
+    paths: [IdentifiedItem<URLPath>] = [],
+    queries: [IdentifiedItem<KeyValue<String,String>>] = [],
+    headerFields: [IdentifiedItem<KeyValue<String, String>>] = [],
+    useBody: Bool = false,
+    body: Data? = nil,
+    encoding: BodyEncoding = .utf8
+  ) {
+    self.name = name
+    self.createdAt = createdAt
+    self.updatedAt = updatedAt
+    self.method = method
+    self.baseUrl = baseUrl
+    self.paths = paths
+    self.queries = queries
+    self.headerFields = headerFields
+    self.useBody = useBody
+    self.body = body
+    self.encoding = encoding
+  }
+  
   var url: URL? {
     let queries = queries.map(\.item).filter { $0.isOn }.map { URLQueryItem(name: $0.key, value: $0.value) }
 
@@ -46,10 +77,6 @@ struct Request: Sendable, Hashable, Identifiable, Codable {
       headerFields: headerFields
     )
   }
-  var headerFields: [IdentifiedItem<KeyValue<String, String>>] = []
-  var useBody = false
-  var body: Data? = nil
-  var encoding: BodyEncoding = .utf8
 }
 
 extension HTTPRequest.Method: Codable {
@@ -67,24 +94,5 @@ extension HTTPRequest.Method: Codable {
   public func encode(to encoder: any Encoder) throws {
     var container = encoder.singleValueContainer()
     try container.encode(rawValue)
-  }
-}
-
-extension URLQueryItem: Codable {
-  private enum CodingKeys: String, CodingKey {
-    case name
-    case value
-  }
-
-  public init(from decoder: Decoder) throws {
-    let container = try decoder.container(keyedBy: CodingKeys.self)
-    let name = try container.decode(String.self, forKey: .name)
-    let value = try container.decodeIfPresent(String.self, forKey: .value)
-    self.init(name: name, value: value)
-  }
-  public func encode(to encoder: any Encoder) throws {
-    var container = encoder.container(keyedBy: CodingKeys.self)
-    try container.encode(name, forKey: .name)
-    try container.encode(value, forKey: .value)
   }
 }

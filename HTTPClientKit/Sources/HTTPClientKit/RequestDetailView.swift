@@ -5,7 +5,7 @@ import SwiftUI
 #if os(macOS)
   struct RequestDetailView: View {
     @Environment(ResultState.self) var resultState
-    @Binding var request: Request
+    var request: Request
     @State var bodyString = ""
     @State var isPresentedBodyEditor = false
     
@@ -64,6 +64,8 @@ import SwiftUI
     }
 
     var body: some View {
+      @Bindable var request: Request = request
+      
       Form {
         TextField("Name", text: $request.name)
 
@@ -220,7 +222,7 @@ import SwiftUI
 
   #Preview {
     @Previewable @State var request = Request(name: "Test", baseUrl: "https://api.github.com/users")
-    RequestDetailView(request: $request)
+    RequestDetailView(request: request)
       .environment(ResultState())
   }
 
@@ -228,7 +230,7 @@ import SwiftUI
 
   struct RequestDetailView: View {
     @Environment(NavigationRouter.self) var router
-    @Binding var request: Request
+    var request: Request
     @State var isPresentedBodyEditor = false
 
     func addNewHeader(header: NewHeader) {
@@ -280,6 +282,8 @@ import SwiftUI
     }
 
     var body: some View {
+      @Bindable var request = request
+      
       Form {
         LabeledContent {
           TextField("Name", text: $request.name)
@@ -306,7 +310,11 @@ import SwiftUI
         }
         Section {
           ForEach($request.paths) { pathItem in
-            TextField("path/to/item", text: pathItem.item)
+            HStack {
+              TextField("path/to/item", text: pathItem.item.value)
+              Toggle("On/Off", isOn: pathItem.item.isOn)
+                .labelsHidden()
+            }
               .swipeActions {
                 Button(role: .destructive) {
                   request.paths.removeAll(where: { $0.id == pathItem.id })
@@ -317,7 +325,7 @@ import SwiftUI
           }
 
           Button {
-            request.paths.append(.init(item: ""))
+            request.paths.append(.init(item: .init(value: "", isOn: true)))
           } label: {
             Label("Add Path", systemImage: "plus")
           }
@@ -331,7 +339,7 @@ import SwiftUI
               Divider()
               TextField("Value", text: queryItem.item.value)
               Divider()
-              Toggle("IsOn", isOn: queryItem.item.isOn)
+              Toggle("On/Off", isOn: queryItem.item.isOn)
                 .labelsHidden()
             }
             .alignmentGuide(.listRowSeparatorLeading) { $0[.leading] }
@@ -367,6 +375,9 @@ import SwiftUI
               TextField("Name", text: headerField.item.key)
               Divider()
               TextField("Value", text: headerField.item.value)
+              Divider()
+              Toggle("On/Off", isOn: headerField.item.isOn)
+                .labelsHidden()
             }
             .swipeActions {
               Button(role: .destructive) {
@@ -402,22 +413,16 @@ import SwiftUI
                 value: Double(request.body?.count ?? 0),
                 unit: UnitInformationStorage.bytes
               ))
-            Label("Edit Body \(bytes)", systemImage: "doc.on.doc")
+            Label("Body \(bytes)", systemImage: "doc.on.doc")
           }
           .sheet(isPresented: $isPresentedBodyEditor) {
             BodyEditor(
-              bodyData: .init(
-                get: { request.body },
-                set: { request.body = $0 }
-              ),
-              encoding: .init(
-                get: { request.encoding },
-                set: { request.encoding = $0 }
-              )
+              bodyData: $request.body,
+              encoding: $request.encoding
             )
           }
         } header: {
-          Toggle("Body", isOn: .init(get: { request.useBody }, set: { request.useBody = $0 }))
+          Toggle("Body", isOn: $request.useBody)
         }
 
         Section("Information") {
@@ -443,7 +448,7 @@ import SwiftUI
     @Previewable @State var request = Request(name: "Test", baseUrl: "https://api.github.com/users")
     @Previewable @State var router = NavigationRouter()
     NavigationStack(path: $router.routes) {
-      RequestDetailView(request: $request)
+      RequestDetailView(request: request)
     }
     .environment(router)
   }

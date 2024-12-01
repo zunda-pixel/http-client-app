@@ -7,7 +7,7 @@ struct HTTPClientApp: App {
   var body: some Scene {
     WindowGroup {
       ContentView()
-        .modelContainer(try! ModelContainer(for: Folder.self, File.self))
+        .modelContainer(try! ModelContainer(for: Folder.self, Request.self))
     }
   }
 }

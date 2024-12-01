@@ -9,47 +9,29 @@ import SwiftUI
     @State var router = NavigationRouter()
     @State var isPresentedSettingsView: Bool = false
     @State var editMode: EditMode = .inactive
-    @State var selectedItemIds: Set<UUID> = []
-    @State var isPresentedMoveItemToFolderView = false
 
     public init() {}
 
     public var body: some View {
       NavigationStack(path: $router.routes) {
         if let rootFolder = folders.first {
-          List(selection: $selectedItemIds) {
+          List {
             FoldersView(parentFolder: rootFolder)
           }
           .environment(\.editMode, $editMode)
           .navigationTitle("HTTP Requests")
           .navigationDestination(for: NavigationRouter.Route.self) { route in
             switch route {
-            case .request(let file):
-              RequestDetailView(request: .init(get: { file.request }, set: { file.request = $0 }))
+            case .request(let request):
+              RequestDetailView(request: request)
             case .requestResult(let result):
               ResultDetailView(result: result)
             }
-          }
-          .sheet(isPresented: $isPresentedMoveItemToFolderView) {
-            MoveItemsToFolder(rootFolder: rootFolder, ids: selectedItemIds)
           }
           .sheet(isPresented: $isPresentedSettingsView) {
             SettingsView()
           }
           .toolbar {
-            ToolbarItemGroup(placement: .bottomBar) {
-              if editMode == .active {
-                Button("Move") {
-                  isPresentedMoveItemToFolderView.toggle()
-                }
-                .disabled(selectedItemIds.isEmpty)
-                Spacer()
-                Button("Delete") {
-
-                }
-                .disabled(selectedItemIds.isEmpty)
-              }
-            }
             ToolbarItemGroup(placement: .topBarTrailing) {
               if editMode == .active {
                 Button("Done") {
@@ -71,17 +53,16 @@ import SwiftUI
                     Button {
                       let folder = Folder(name: "NewFolder1")
                       modelContext.insert(folder)
-                      rootFolder.childrenIds.append(folder.id)
+                      rootFolder.childrenFolders.append(folder)
                     } label: {
                       Label("Add Folder", systemImage: "folder.badge.plus")
                     }
                     Button {
-                      let file = File(
-                        request: .init(name: "NewRequest1", baseUrl: "https://apple.com"))
-                      modelContext.insert(file)
-                      rootFolder.childrenIds.append(file.id)
+                      let request = Request(name: "NewRequest1", baseUrl: "https://apple.com")
+                      modelContext.insert(request)
+                      rootFolder.childrenRequests.append(request)
                     } label: {
-                      Label("Add File", systemImage: "doc.badge.plus")
+                      Label("Add Request", systemImage: "doc.badge.plus")
                     }
                   }
                   Section {

@@ -6,7 +6,7 @@ import Observation
     var routes: [Route] = []
 
     enum Route: Hashable {
-      case request(File)
+      case request(Request)
       case requestResult(HTTPResult)
     }
   }

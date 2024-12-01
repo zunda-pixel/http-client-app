@@ -6,13 +6,17 @@ final public class Folder: Identifiable, Hashable, @unchecked Sendable {
   public typealias ID = UUID
   @Attribute(.unique) public var id: ID
   var name: String
-  var childrenIds: [UUID] = []
+  var childrenFolders: [Folder] = []
+  var childrenRequests: [Request] = []
+  
   init(
     name: String,
-    childrenIds: [UUID] = []
+    childrenFolders: [Folder] = [],
+    childrenRequests: [Request] = []
   ) {
     self.id = .init()
     self.name = name
-    self.childrenIds = childrenIds
+    self.childrenFolders = childrenFolders
+    self.childrenRequests = childrenRequests
   }
 }
