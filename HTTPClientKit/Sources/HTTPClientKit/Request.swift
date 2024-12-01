@@ -6,6 +6,7 @@ import SwiftData
 
 @Model
 public final class Request: @unchecked Sendable, Hashable {
+  @Attribute(.unique) public var id = UUID()
   var name: String
   var createdAt: Date
   var updatedAt: Date

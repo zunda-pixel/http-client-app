@@ -18,14 +18,14 @@ import SwiftUI
           }
           .contextMenu {
             Button {
-              let newFolder = Folder(name: "NewFolder1")
+              let newFolder = rootFolder.createNewFolder()
               modelContext.insert(newFolder)
               rootFolder.childrenFolders.append(newFolder)
             } label: {
               Label("Add Folder", systemImage: "folder.badge.plus")
             }
             Button {
-              let newRequest = Request(name: "NewRequest1", baseUrl: "https://apple.com")
+              let newRequest = rootFolder.createNewRequest()
               modelContext.insert(newRequest)
               rootFolder.childrenRequests.append(newRequest)
             } label: {

@@ -51,14 +51,14 @@ import SwiftUI
 
                   Section {
                     Button {
-                      let folder = Folder(name: "NewFolder1")
-                      modelContext.insert(folder)
-                      rootFolder.childrenFolders.append(folder)
+                      let newFolder = rootFolder.createNewFolder()
+                      modelContext.insert(newFolder)
+                      rootFolder.childrenFolders.append(newFolder)
                     } label: {
                       Label("Add Folder", systemImage: "folder.badge.plus")
                     }
                     Button {
-                      let request = Request(name: "NewRequest1", baseUrl: "https://apple.com")
+                      let request = rootFolder.createNewRequest()
                       modelContext.insert(request)
                       rootFolder.childrenRequests.append(request)
                     } label: {

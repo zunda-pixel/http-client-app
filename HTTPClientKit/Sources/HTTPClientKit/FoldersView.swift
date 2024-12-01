@@ -53,14 +53,14 @@ struct FolderCell: View {
           }
           Section {
             Button {
-              let newFolder = Folder(name: "NewFolder1")
+              let newFolder = folder.createNewFolder()
               modelContext.insert(newFolder)
               folder.childrenFolders.append(newFolder)
             } label: {
               Label("Add Folder", systemImage: "folder.badge.plus")
             }
             Button {
-              let newRequest = Request(name: "NewRequest1", baseUrl: "https://apple.com")
+              let newRequest = folder.createNewRequest()
               modelContext.insert(newRequest)
               folder.childrenRequests.append(newRequest)
             } label: {
