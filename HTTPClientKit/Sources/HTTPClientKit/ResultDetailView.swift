@@ -102,7 +102,7 @@ extension ResultDetailView {
           if response.headerFields.isEmpty {
             Text("No headers")
           } else {
-            DisclosureGroup("Headers", isExpanded: $isExpanded) {
+            DisclosureGroup("Headers", isExpanded: $isExpandedHeaders) {
               ForEach(response.headerFields.sorted(using: KeyPathComparator(\.name.rawName))) {
                 header in
                 HStack {

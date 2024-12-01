@@ -1,6 +1,7 @@
 struct KeyValue<Key, Value> {
   var key: Key
   var value: Value
+  var isOn: Bool
 }
 
 extension KeyValue: Codable where Key: Codable, Value: Codable {}

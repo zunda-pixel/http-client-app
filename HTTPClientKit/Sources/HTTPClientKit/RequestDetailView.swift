@@ -28,13 +28,13 @@ import SwiftUI
     func addNewHeader(header: NewHeader) {
       switch header {
       case .new:
-        request.headerFields.append(.init(item: .init(key: "", value: "")))
+        request.headerFields.append(.init(item: .init(key: "", value: "", isOn: true)))
       case .authorization:
         request.headerFields.append(
-          .init(item: .init(key: HTTPField.Name.authorization.rawName, value: "")))
+          .init(item: .init(key: HTTPField.Name.authorization.rawName, value: "", isOn: true)))
       case .contentType:
         request.headerFields.append(
-          .init(item: .init(key: HTTPField.Name.contentType.rawName, value: "")))
+          .init(item: .init(key: HTTPField.Name.contentType.rawName, value: "", isOn: true)))
       }
     }
 
@@ -85,7 +85,11 @@ import SwiftUI
 
         Section("Paths") {
           ForEach($request.paths.indexed(), id: \.element.id) { i, path in
-            TextField("Path\(i)", text: path.item)
+            HStack {
+              TextField("Path\(i)", text: path.item.value)
+              Toggle("On/Off", isOn: path.item.isOn)
+                .labelsHidden()
+            }
               .contentShape(.rect)
               .contextMenu {
                 Button {
@@ -97,7 +101,7 @@ import SwiftUI
           }
 
           Button {
-            request.paths.append(.init(item: ""))
+            request.paths.append(.init(item: .init(value: "", isOn: true)))
           } label: {
             Label("Add Path", systemImage: "plus")
           }
@@ -114,7 +118,10 @@ import SwiftUI
               TextField("Value", text: query.item.value)
                 .labelsHidden()
             }
-
+            TableColumn("On/Off") { query in
+              Toggle("On/Off", isOn: query.item.isOn)
+                .labelsHidden()
+            }
             TableColumn("Actions") { query in
               Button {
                 request.queries.removeAll { $0.id == query.id }
@@ -127,7 +134,7 @@ import SwiftUI
           Button {
             let number = generateNewQueryNameNumber(prefix: "Name")
             request.queries.append(
-              .init(item: .init(key: "Name\(number)", value: "Value\(number)")))
+              .init(item: .init(key: "Name\(number)", value: "Value\(number)", isOn: true)))
           } label: {
             Label("Add Query", systemImage: "plus")
           }
@@ -142,6 +149,11 @@ import SwiftUI
 
             TableColumn("Value") { headerField in
               TextField("Value", text: headerField.item.value)
+                .labelsHidden()
+            }
+            
+            TableColumn("On/Off") { headerField in
+              Toggle("On/Off", isOn: headerField.item.isOn)                
                 .labelsHidden()
             }
 
@@ -222,13 +234,13 @@ import SwiftUI
     func addNewHeader(header: NewHeader) {
       switch header {
       case .new:
-        request.headerFields.append(.init(item: .init(key: "", value: "")))
+        request.headerFields.append(.init(item: .init(key: "", value: "", isOn: true)))
       case .authorization:
         request.headerFields.append(
-          .init(item: .init(key: HTTPField.Name.authorization.rawName, value: "")))
+          .init(item: .init(key: HTTPField.Name.authorization.rawName, value: "", isOn: true)))
       case .contentType:
         request.headerFields.append(
-          .init(item: .init(key: HTTPField.Name.contentType.rawName, value: "")))
+          .init(item: .init(key: HTTPField.Name.contentType.rawName, value: "", isOn: true)))
       }
     }
 
@@ -318,7 +330,11 @@ import SwiftUI
               TextField("Name", text: queryItem.item.key)
               Divider()
               TextField("Value", text: queryItem.item.value)
+              Divider()
+              Toggle("IsOn", isOn: queryItem.item.isOn)
+                .labelsHidden()
             }
+            .alignmentGuide(.listRowSeparatorLeading) { $0[.leading] }
             .swipeActions {
               Button(role: .destructive) {
                 request.queries.removeAll(where: { $0.id == queryItem.wrappedValue.id })
@@ -334,7 +350,8 @@ import SwiftUI
               .init(
                 item: .init(
                   key: "Name\(number)",
-                  value: "Value\(number)"
+                  value: "Value\(number)",
+                  isOn: true
                 ))
             )
           } label: {
